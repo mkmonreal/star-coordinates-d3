@@ -1,10 +1,12 @@
 import { select } from "d3";
 import { randomInt } from "mathjs";
-import standarizeData from "./js/standarize";
-import normalizeData from "./js/normalize";
+import { standarizeData } from "./js/standarize";
+import { normalizeData } from "./js/normalize";
 import { buildPolarVector, buildCartesianVector, addLable } from "./js/vector";
 import { drawArrows } from "./js/arrow";
 import { drawDots } from "./js/dot";
+import { setUpFileInput } from "./js/file-reader";
+import { parseCsv } from "./js/csv-parser";
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -12,18 +14,20 @@ const center = [width / 2, height / 2];
 const radius = Math.min(width, height) / 4;
 
 const headers = [
-  "health",
+  "hp",
   "attack",
   "defense",
-  "specialAttack",
-  "specialDefense",
+  "sp_attack",
+  "sp_defense",
   "speed",
 ];
+
+let newHeaders = [];
 
 const vectors = [];
 const data = [];
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 1028; i++) {
   let obj = {};
   for (let j = 0; j < headers.length; j++) {
     obj[headers[j]] = randomInt(255);
@@ -82,4 +86,15 @@ const standarizedData = standarizeData(data, headers);
 
 draw(vectors, normalizedData, headers);
 
-console.log(center);
+setUpFileInput((ev) => {
+  const result = ev.target.result;
+  const resultCsv = parseCsv(result);
+  newHeaders = resultCsv.columns;
+  const newNomalizedData = normalizeData(resultCsv, headers);
+  const newStandarizedData = standarizeData(resultCsv, newHeaders);
+
+  console.log(newStandarizedData);
+  console.log(newNomalizedData);
+
+  draw(vectors, newStandarizedData, headers);
+});

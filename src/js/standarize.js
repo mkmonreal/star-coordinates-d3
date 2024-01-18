@@ -14,19 +14,17 @@ const standardDeviation = (data, mean) => Math.sqrt(variance(data, mean));
 const standarize = (value, mean, standardDeviation) =>
   (value - mean) / standardDeviation;
 
-const standarizeData = (data, headers) => {
+export const standarizeData = (data, headers) => {
   let result = clone(data);
   headers.forEach((header) => {
-    const values = result.map((x) => x[header]);
-    const m = mean(values);
-    const sd = standardDeviation(values, m);
+    const values = result.map((x) => parseFloat(x[header]));
+    const meanValue = mean(values);
+    const standardDeviationValue = standardDeviation(values, meanValue);
 
     result = result.map((x) => {
-      x[header] = standarize(x[header], m, sd);
+      x[header] = standarize(parseFloat(x[header]), meanValue, standardDeviationValue);
       return x;
     });
   });
   return result;
 };
-
-export default standarizeData;
