@@ -1,5 +1,7 @@
 import { select } from "d3";
 import { randomInt } from "mathjs";
+import { eigs } from "mathjs";
+
 import { standarizeData } from "./js/standarize";
 import { normalizeData } from "./js/normalize";
 import { buildPolarVector, buildCartesianVector, addLable } from "./js/vector";
@@ -7,6 +9,7 @@ import { drawArrows } from "./js/arrow";
 import { drawDots } from "./js/dot";
 import { setUpFileInput } from "./js/file-reader";
 import { parseCsv } from "./js/csv-parser";
+import { covarianceMatrix } from "./js/operations";
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -98,3 +101,10 @@ setUpFileInput((ev) => {
 
   draw(vectors, newStandarizedData, headers);
 });
+
+console.log("Covariance matrix");
+const cMatrix= covarianceMatrix(standarizedData, headers);
+console.log(cMatrix);
+console.log("Eign");
+const eigen = eigs(cMatrix);
+console.log(eigen);
