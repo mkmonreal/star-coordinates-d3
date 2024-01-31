@@ -27,32 +27,32 @@ export const covariance = (dataA, dataB, meanA, meanB) => {
     return sum / dataA.length;
 };
 
-export const covarianceMatrix = (data, headers, means) => {
+export const createCovarianceMatrix = (data, columns, means) => {
     const result = [];
-    for (let i = 0; i < headers.length; i++) {
+    for (let i = 0; i < columns.length; i++) {
         result[i] = [];
     }
 
     if (!means) {
         means = {};
-        for (let header of headers) {
-            means[header] = mean(data.map(x => x[header]));
+        for (let column of columns) {
+            means[column] = mean(data.map(x => x[column]));
         }
     }
 
-    for (let i = 0; i < headers.length; i++) {
-        for (let j = 0; j < headers.length; j++) {
+    for (let i = 0; i < columns.length; i++) {
+        for (let j = 0; j < columns.length; j++) {
             if (result[i][j]) {
                 continue;
             }
 
             if (i === j) {
-                const d = data.map(x => x[headers[i]]);
-                result[i][j] = variance(d, means[headers[i]]);
+                const d = data.map(x => x[columns[i]]);
+                result[i][j] = variance(d, means[columns[i]]);
             } else {
-                const dA = data.map(x => x[headers[i]]);
-                const dB = data.map(x => x[headers[j]]);
-                const r = covariance(dA, dB, means[headers[i]], means[headers[j]]);
+                const dA = data.map(x => x[columns[i]]);
+                const dB = data.map(x => x[columns[j]]);
+                const r = covariance(dA, dB, means[columns[i]], means[columns[j]]);
                 result[i][j] = r;
                 result[j][i] = r;
             }

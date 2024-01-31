@@ -11,8 +11,8 @@ const enter = (selection) =>
       .append("circle")
       .attr("class", "dot")
       .attr("r", 3)
-      .attr("stroke", "red")
-      .attr("fill", "lightyellow")
+      .attr("stroke", "salmon")
+      .attr("fill", "salmon")
   );
 
 const merge = (selection, enter) => updatePosition(selection.merge(enter));
