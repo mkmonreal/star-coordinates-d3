@@ -1,4 +1,4 @@
-import { clone } from "./utils";
+import { clone } from "../utils";
 
 const sumarize = (data) => data.reduce((x, y) => x + y);
 
@@ -14,7 +14,7 @@ const standardDeviation = (data, mean) => Math.sqrt(variance(data, mean));
 const standarize = (value, mean, standardDeviation) =>
   (value - mean) / standardDeviation;
 
-export const standarizeData = (data, headers) => {
+const standarizeData = (data, headers) => {
   let result = clone(data);
   headers.forEach((header) => {
     const values = result.map((x) => parseFloat(x[header]));
@@ -28,3 +28,5 @@ export const standarizeData = (data, headers) => {
   });
   return result;
 };
+
+export default standarizeData;

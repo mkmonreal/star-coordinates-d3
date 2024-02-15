@@ -1,5 +1,5 @@
 import { line, drag } from "d3";
-import { buildCartesianVector } from "./vector";
+import { buildCartesianVector } from "../utils/vector";
 
 const getLineGenerator = () => line();
 
@@ -51,7 +51,7 @@ const addArrowHead = (selection, lineGenerator, cx, cy, dragFunction) =>
 
     .call(drag()
 
-    .on("drag", dragFunction));
+      .on("drag", dragFunction));
 
 const addArrow = (selection, lineGenerator, cx, cy, dragFunction) => {
   addArrowBody(selection, lineGenerator, cx, cy);

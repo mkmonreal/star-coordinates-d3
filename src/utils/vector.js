@@ -18,14 +18,20 @@ const addPolar = (vector) => {
   return vector;
 };
 
-const buildPolarVector = (module, angle) => {
+const buildPolarVector = (module, angle, lable) => {
   const vector = {};
+  if (lable) {
+    vector.lable = lable
+  }
   vector.polar = { module, angle };
   return addCartesian(vector);
 };
 
-const buildCartesianVector = (x, y) => {
+const buildCartesianVector = (x, y, lable) => {
   const vector = {};
+  if (lable) {
+    vector.lable = lable
+  }
   vector.cartesian = { x, y };
   return addPolar(vector);
 };
