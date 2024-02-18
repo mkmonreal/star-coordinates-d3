@@ -55,7 +55,7 @@ const StarCoordinates = ({ height, width }) => {
                 {vectors && vectors.map(vector =>
                     <Axis
                         key={vector.id}
-                        vector={{ vector }}
+                        vector={ vector }
                     />
                 )}
 
