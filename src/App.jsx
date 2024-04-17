@@ -1,14 +1,15 @@
-import './App.css'
+import './App.css';
 
-import StarCoordinates from './components/StarCoordinates.jsx'
+import StarCoordinates from './components/StarCoordinates';
 
 function App() {
-  let width = window.innerWidth;
-  let height = window.innerHeight;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
   return (
     <StarCoordinates height={height} width={width} />
+    // <span>Texto de prueba</span>
   );
 }
 
-export default App
+export default App;

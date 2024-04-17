@@ -1,1 +1,3 @@
-export const clone = (data) => data.map(d => { return {...d} });
+const clone = (data) => data.map((d) => ({ ...d }));
+
+export default clone;

@@ -1,18 +1,19 @@
-import { clone } from "../utils";
+import clone from '../utils';
 
 const sumarize = (data) => data.reduce((x, y) => x + y);
 
 const mean = (data) => sumarize(data) / data.length;
 
-const variance = (data, mean) => {
-  const sum = data.reduce((x, y) => x + Math.pow(y - mean, 2));
+const variance = (data, meanValue) => {
+  const sum = data.reduce((x, y) => x + (y - meanValue) ** 2);
   return sum / data.length;
+};
+
+const standardDeviation = (data, meanValue) => Math.sqrt(variance(data, meanValue));
+
+function standarize(value, meanValue, standardDeviationValue) {
+  return (value - meanValue) / standardDeviationValue;
 }
-
-const standardDeviation = (data, mean) => Math.sqrt(variance(data, mean));
-
-const standarize = (value, mean, standardDeviation) =>
-  (value - mean) / standardDeviation;
 
 const standarizeData = (data, headers) => {
   let result = clone(data);
@@ -22,8 +23,9 @@ const standarizeData = (data, headers) => {
     const standardDeviationValue = standardDeviation(values, meanValue);
 
     result = result.map((x) => {
-      x[header] = standarize(parseFloat(x[header]), meanValue, standardDeviationValue);
-      return x;
+      const newX = x;
+      newX[header] = standarize(parseFloat(newX[header]), meanValue, standardDeviationValue);
+      return newX;
     });
   });
   return result;
