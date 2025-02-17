@@ -1,5 +1,5 @@
-import { line, drag } from "d3";
-import { buildCartesianVector } from "./vector";
+import { line, drag } from 'd3';
+import { buildCartesianVector } from '../utils/vector';
 
 const getLineGenerator = () => line();
 
@@ -22,36 +22,28 @@ const getArrowBody = (lineGenerator, cx, cy, x, y) => {
   return lineGenerator(path);
 };
 
-const getArrowsSelection = (selection, vectors) =>
-  selection.selectAll(".arrow").data(vectors, (d) => `${d.lable}${d.cartesian.x}${d.cartesian.y}`);
+const getArrowsSelection = (selection, vectors) => selection.selectAll('.arrow').data(vectors, (d) => `${d.lable}${d.cartesian.x}${d.cartesian.y}`);
 
-const addArrowBody = (selection, lineGenerator, cx, cy) =>
-  selection
-    .append("path")
-    .attr("class", "arrow-body")
-    .attr("d", (d) =>
-      getArrowBody(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y)
-    )
-    .attr("stroke", "black");
+const addArrowBody = (selection, lineGenerator, cx, cy) => selection
+  .append('path')
+  .attr('class', 'arrow-body')
+  .attr('d', (d) => getArrowBody(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y))
+  .attr('stroke', 'black');
 
-const addArrowHead = (selection, lineGenerator, cx, cy, dragFunction) =>
-  selection
-    .append("path")
-    .attr("class", "arrow-head")
-    .attr("d", (d) =>
-      getArrowHead(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y)
-    )
-    .attr(
-      "transform",
-      (d) =>
-        `rotate(${d.polar.angle}, ${d.cartesian.x + cx}, ${d.cartesian.y + cy})`
-    )
-    .attr("stroke", "black")
-    .attr("fill", "lightgray")
+const addArrowHead = (selection, lineGenerator, cx, cy, dragFunction) => selection
+  .append('path')
+  .attr('class', 'arrow-head')
+  .attr('d', (d) => getArrowHead(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y))
+  .attr(
+    'transform',
+    (d) => `rotate(${d.polar.angle}, ${d.cartesian.x + cx}, ${d.cartesian.y + cy})`,
+  )
+  .attr('stroke', 'black')
+  .attr('fill', 'lightgray')
 
-    .call(drag()
+  .call(drag()
 
-    .on("drag", dragFunction));
+    .on('drag', dragFunction));
 
 const addArrow = (selection, lineGenerator, cx, cy, dragFunction) => {
   addArrowBody(selection, lineGenerator, cx, cy);
@@ -59,25 +51,18 @@ const addArrow = (selection, lineGenerator, cx, cy, dragFunction) => {
   return selection;
 };
 
-const updateArrowHead = (selection, lineGenerator, cx, cy, dragFunction) =>
-  selection
-    .selectAll(".arrow-head")
-    .attr("d", (d) =>
-      getArrowHead(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y)
-    )
-    .attr(
-      "transform",
-      (d) =>
-        `rotate(${d.polar.angle}, ${d.cartesian.x + cx}, ${d.cartesian.y + cy})`
-    )
-    .call(drag().on("drag", dragFunction));
+const updateArrowHead = (selection, lineGenerator, cx, cy, dragFunction) => selection
+  .selectAll('.arrow-head')
+  .attr('d', (d) => getArrowHead(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y))
+  .attr(
+    'transform',
+    (d) => `rotate(${d.polar.angle}, ${d.cartesian.x + cx}, ${d.cartesian.y + cy})`,
+  )
+  .call(drag().on('drag', dragFunction));
 
-const updateArrowBody = (selection, lineGenerator, cx, cy) =>
-  selection
-    .selectAll(".arrow-body")
-    .attr("d", (d) =>
-      getArrowBody(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y)
-    );
+const updateArrowBody = (selection, lineGenerator, cx, cy) => selection
+  .selectAll('.arrow-body')
+  .attr('d', (d) => getArrowBody(lineGenerator, cx, cy, d.cartesian.x, d.cartesian.y));
 
 const updateArrow = (selection, lineGenerator, cx, cy, dragFunction) => {
   updateArrowBody(selection, lineGenerator, cx, cy);
@@ -85,8 +70,7 @@ const updateArrow = (selection, lineGenerator, cx, cy, dragFunction) => {
   return selection;
 };
 
-const enter = (selection) =>
-  selection.enter().append("g").attr("class", "arrow");
+const enter = (selection) => selection.enter().append('g').attr('class', 'arrow');
 
 const merge = (selection, enter) => selection.merge(enter);
 
