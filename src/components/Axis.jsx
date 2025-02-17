@@ -1,5 +1,5 @@
 import { line } from 'd3';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import useDrag from '../hooks/useDrag';
 import { buildCartesianVector } from '../utils/vector';
@@ -22,31 +22,35 @@ const getPath = ({ x, y }) => [
 function Axis({
   vector, dragHandler,
 }) {
-  const {
-    cartesian, polar, lable, id,
-  } = vector;
-  const { x, y } = cartesian;
-  const { angle } = polar;
+  const [vec, setVec] = useState(vector);
 
   const arrowheadRef = useRef();
 
   useDrag(arrowheadRef, (e) => {
-    const newVector = buildCartesianVector(x + e.dx, y - e.dy, lable, id);
-    dragHandler(newVector);
+    console.log('e', e);
+
+    setVec((prevVec) => {
+      console.log('id', prevVec.id);
+      const x = prevVec.cartesian.x + e.dx;
+      const y = prevVec.cartesian.y - e.dy;
+      const newVec = buildCartesianVector(x, y, prevVec.lable, prevVec.id);
+      dragHandler(newVec);
+      return newVec;
+    });
   });
 
   return (
     <g>
       <path
-        d={lineGenerator(getPath({ x, y: -y }))}
+        d={lineGenerator(getPath({ x: vec.cartesian.x, y: -vec.cartesian.y }))}
         stroke="gray"
       />
       <path
         ref={arrowheadRef}
-        d={lineGenerator(getArrowheadPath({ x, y: -y }))}
+        d={lineGenerator(getArrowheadPath({ x: vec.cartesian.x, y: -vec.cartesian.y }))}
         stroke="gray"
         fill="gray"
-        transform={`rotate(${-angle}, ${x}, ${-y})`}
+        transform={`rotate(${-vec.polar.angle}, ${vec.cartesian.x}, ${-vec.cartesian.y})`}
       />
     </g>
   );

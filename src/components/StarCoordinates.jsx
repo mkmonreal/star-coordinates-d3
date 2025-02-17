@@ -13,25 +13,24 @@ function StarCoordinates({ height, width }) {
 
   const [minX, setMinX] = useState(-centerX);
   const [minY, setMinY] = useState(-centerY);
-  const [vectors, setVectors] = useState(() => {
-    const newVectors = [];
-    for (let i = 0; i < 6; i += 1) {
-      const newVector = buildCartesianVector(Math.random() * 150, Math.random() * 150, `lable ${i}`);
-      newVectors.push({ ...newVector, id: i });
-    }
-    return newVectors;
-  });
   const [data, setData] = useState([]);
+
+  const originalVecotrs = [];
+  for (let i = 0; i < 6; i += 1) {
+    const newVector = buildCartesianVector(Math.random() * 150, Math.random() * 150, `lable ${i}`);
+    originalVecotrs.push({ ...newVector, id: i });
+  }
+  const [vectors, setVectors] = useState(originalVecotrs);
 
   const vectorMovementHandler = (newVector) => {
     setVectors((prevVectors) => {
-      console.log(`Actualizando vector ${newVector.lable}`);
-      console.log(prevVectors);
-      let newVectors = [...prevVectors];
+      // console.log(`Actualizando vector ${newVector.lable}`);
+      // console.log(prevVectors);
+      let newVectors = prevVectors.slice();
       newVectors = newVectors.map((vector) => (vector.lable === newVector.lable
         ? { ...newVector, id: vector.id }
         : vector));
-      console.log(newVectors);
+      console.log('vectors: ', newVectors);
       return newVectors;
     });
   };
@@ -50,6 +49,7 @@ function StarCoordinates({ height, width }) {
 
   const svgRef = useRef();
   useDrag(svgRef, (event) => {
+    console.log('event', event);
     setMinX((prevMinX) => prevMinX - event.dx);
     setMinY((prevMinY) => prevMinY - event.dy);
   });
@@ -68,7 +68,7 @@ function StarCoordinates({ height, width }) {
         stroke="grey"
         fill="none"
       />
-      {vectors && vectors.map((vector) => (
+      {originalVecotrs && originalVecotrs.map((vector) => (
         <Axis
           key={vector.lable}
           vector={vector}
