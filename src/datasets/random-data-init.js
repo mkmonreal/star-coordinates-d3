@@ -16,8 +16,9 @@ export function createRandomData() {
 export function createRandomVectors() {
 	const randomVectors = [];
 	for (let i = 0; i < 6; i += 1) {
-		const newVector = buildCartesianVector((Math.random() * 300) - 150, (Math.random() * 300) - 150, `lable ${i}`);
-		randomVectors.push({ ...newVector, id: i });
+		const newVector = buildCartesianVector((Math.random() * 300) - 150, (Math.random() * 300) - 150, `lable ${+i}`);
+		newVector.id = `${+i}`;
+		randomVectors.push(newVector);
 	}
 	return randomVectors;
 }
