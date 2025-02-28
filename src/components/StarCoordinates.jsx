@@ -11,6 +11,7 @@ import DataCircle from './DataCircle';
 
 function StarCoordinates({ height, width }) {
 	const vectors = useStarCoordinatesStore((state) => state.vectors);
+	const headers = useStarCoordinatesStore((state) => state.headers);
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
 	const centerX = width / 2;

@@ -12,6 +12,7 @@
   "author": "mkmonreal",
   "license": "Apache-2.0",
   "dependencies": {
+    "@ant-design/icons": "^5.6.1",
     "antd": "^5.13.2",
     "d3": "^7.0.0",
     "mathjs": "^9.4.4",
