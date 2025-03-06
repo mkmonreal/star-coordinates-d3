@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import react from '@vitejs/plugin-react-swc';
-import { path } from 'd3';
+import path from 'path';
 import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
