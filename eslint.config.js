@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
 
 export default [
 	{ ignores: ['dist'] },
@@ -23,6 +24,7 @@ export default [
 			'react-refresh': reactRefresh,
 			import: importPlugin,
 			'unused-imports': unusedImports,
+			prettier: eslintPluginPrettier,
 		},
 		rules: {
 			...js.configs.recommended.rules,
