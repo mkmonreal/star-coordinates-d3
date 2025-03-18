@@ -6,14 +6,65 @@ import { useState, useRef } from 'react';
 import StarCoordinates from './components/StarCoordinates';
 import useStarCoordinatesStore from './stores/star-coorditantes-store';
 import parseCsv from './js/csv-parser';
+import { buildPolarVector } from './utils/vector';
+import normalizeData from './js/data/normalize';
+import useConfigStore from './stores/config-store';
 
-const onFileReaderLoad = (event, parser, setHeaders, setOriginalData) => {
+const onFileReaderLoad = (
+	event,
+	parser,
+	idColumn,
+	setHeaders,
+	setOriginalData,
+	setNomalizedData,
+	setVectors
+) => {
 	const result = event.target?.result;
 	const csv = parser(result);
 	const { columns } = csv;
 
 	setHeaders(columns);
 	setOriginalData(csv);
+
+	// 1. Sacar las columnas que solo tienen valores numericos
+	const validHeaders = [];
+	const incompleteColumn = [];
+	for (const column of columns) {
+		const columnWithoutNull = csv
+			.map((d) => d[column])
+			.filter((d) => d !== null && d !== undefined);
+		if (columnWithoutNull < csv.length) {
+			incompleteColumn.push(column);
+		}
+		const numericData = columnWithoutNull
+			.map((d) => parseFloat(d))
+			.filter((d) => !isNaN(d));
+		if (numericData.length === columnWithoutNull.length) {
+			validHeaders.push(column);
+		}
+	}
+
+	// 2. Construir los vectores con las columnas que tienen valores numericos
+	const vectors = [];
+	const angleDiff = 360 / validHeaders.length;
+	for (const [index, validHeader] of validHeaders.entries()) {
+		const module = 1;
+		const angle = index * angleDiff;
+		const vector = buildPolarVector(module, angle, validHeader, validHeader);
+		vectors.push(vector);
+	}
+	setVectors(vectors);
+
+	// 3. Normalizar los datos
+	const validData = csv.map((d) => {
+		const data = {};
+		for (const validHeader of validHeaders) {
+			data[validHeader] = parseFloat(d[validHeader]);
+		}
+		return data;
+	});
+	const normalizedData = normalizeData(validData, validHeaders, [idColumn]);
+	setNomalizedData(normalizedData);
 };
 
 const onFileInputChange = (event, onLoad) => {
@@ -31,18 +82,38 @@ function App() {
 
 	const headers = useStarCoordinatesStore((state) => state.headers);
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
+	const normalizedData = useStarCoordinatesStore(
+		(state) => state.normalizedData
+	);
 	const setHeaders = useStarCoordinatesStore((state) => state.setHeaders);
-	const setOriginalData = useStarCoordinatesStore((state) => state.setOriginalData);
+	const setOriginalData = useStarCoordinatesStore(
+		(state) => state.setOriginalData
+	);
+	const setNormalizedData = useStarCoordinatesStore(
+		(state) => state.setNormalizedData
+	);
+	const setVectors = useStarCoordinatesStore((state) => state.setVectors);
 
-	const fileReaderFunc = (ev) => onFileReaderLoad(ev, parseCsv, setHeaders, setOriginalData);
+	const idColumn = useConfigStore((state) => state.idColumn);
+
+	const fileReaderFunc = (ev) =>
+		onFileReaderLoad(
+			ev,
+			parseCsv,
+			idColumn,
+			setHeaders,
+			setOriginalData,
+			setNormalizedData,
+			setVectors
+		);
 	const fileChangeFunc = (ev) => onFileInputChange(ev, fileReaderFunc);
 	return (
 		<>
-			{
-				originalData.length
-					? <StarCoordinates width={width} height={height} />
-					: <Empty />
-			}
+			{originalData.length ? (
+				<StarCoordinates width={width} height={height} />
+			) : (
+				<Empty />
+			)}
 
 			<FloatButton.Group shape="circle">
 				<FloatButton
@@ -52,10 +123,23 @@ function App() {
 						inputFileRef.current?.click();
 					}}
 				/>
-				<FloatButton icon={<SettingFilled />} type="default" onClick={() => setIsOpen(true)} />
+				<FloatButton
+					icon={<SettingFilled />}
+					type="default"
+					onClick={() => setIsOpen(true)}
+				/>
 			</FloatButton.Group>
-			<Drawer title="Configuration" onClose={() => setIsOpen(false)} open={isOpen} />
-			<input ref={inputFileRef} type="file" style={{ display: 'none' }} onChange={(event) => fileChangeFunc(event)} />
+			<Drawer
+				title="Configuration"
+				onClose={() => setIsOpen(false)}
+				open={isOpen}
+			/>
+			<input
+				ref={inputFileRef}
+				type="file"
+				style={{ display: 'none' }}
+				onChange={(event) => fileChangeFunc(event)}
+			/>
 		</>
 	);
 }

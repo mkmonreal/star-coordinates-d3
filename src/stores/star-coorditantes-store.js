@@ -1,21 +1,24 @@
 import { create } from 'zustand';
-import { createRandomDataAndVectors } from '../datasets/random-data-init';
-
-const [randomVectors] = createRandomDataAndVectors();
 
 const useStarCoordinatesStore = create((set, get) => ({
 	headers: [],
+	validHeaders: [],
 	originalData: [],
 	processedData: [],
-	vectors: randomVectors,
+	normalizedData: [],
+	vectors: [],
 	setHeaders: (headers) => set({ headers }),
+	setValidHeaders: (validHeaders) => set({ validHeaders }),
 	setOriginalData: (originalData) => set({ originalData }),
 	setProcessedData: (processedData) => set({ processedData }),
 	hasOriginalData: () => get().originalData.size > 0,
+	setNormalizedData: (normalizedData) => set({ normalizedData }),
+	setVectors: (vectors) => set({ vectors }),
 	updateVector: (vector) => {
 		const prevVectors = get().vectors;
-		const newVectors = prevVectors.map((v) => (vector.id === v.id
-			? vector : v));
+		const newVectors = prevVectors.map((v) =>
+			vector.id === v.id ? vector : v
+		);
 		set({ vectors: newVectors });
 	},
 }));

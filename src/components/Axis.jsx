@@ -4,6 +4,11 @@ import PropTypes from 'prop-types';
 import useDrag from '../hooks/useDrag';
 import { buildCartesianVector } from '../utils/vector';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import useConfigStore from '../stores/config-store';
+import { sin } from 'mathjs';
+import { unit } from 'mathjs';
+import { tan } from 'mathjs';
+import { mod } from 'mathjs';
 
 const lineGenerator = line();
 
@@ -23,14 +28,19 @@ const getPath = ({ x, y }) => [
 function Axis({ vector }) {
 	const updateVector = useStarCoordinatesStore((state) => state.updateVector);
 
+	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
+
 	const [vec, setVec] = useState(vector);
 
 	const arrowheadRef = useRef();
 
+	const x = unitCircleRadius * vec.cartesian.x;
+	const y = unitCircleRadius * -vec.cartesian.y;
+
 	useDrag(arrowheadRef, (e) => {
 		setVec((prevVec) => {
-			const x = prevVec.cartesian.x + e.dx;
-			const y = prevVec.cartesian.y - e.dy;
+			const x = prevVec.cartesian.x + e.dx / unitCircleRadius;
+			const y = prevVec.cartesian.y - e.dy / unitCircleRadius;
 			const newVec = buildCartesianVector(x, y, prevVec.lable, prevVec.id);
 			updateVector(newVec);
 			return newVec;
@@ -39,16 +49,13 @@ function Axis({ vector }) {
 
 	return (
 		<g>
-			<path
-				d={lineGenerator(getPath({ x: vec.cartesian.x, y: -vec.cartesian.y }))}
-				stroke="gray"
-			/>
+			<path d={lineGenerator(getPath({ x, y }))} stroke="gray" />
 			<path
 				ref={arrowheadRef}
-				d={lineGenerator(getArrowheadPath({ x: vec.cartesian.x, y: -vec.cartesian.y }))}
+				d={lineGenerator(getArrowheadPath({ x, y }))}
 				stroke="gray"
 				fill="gray"
-				transform={`rotate(${-vec.polar.angle}, ${vec.cartesian.x}, ${-vec.cartesian.y})`}
+				transform={`rotate(${mod(360 - vec.polar.angle, 360)}, ${x}, ${y})`}
 			/>
 		</g>
 	);
