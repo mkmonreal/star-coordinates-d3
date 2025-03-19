@@ -9,12 +9,15 @@ import parseCsv from '@/js/csv-parser';
 import { buildPolarVector } from '@/utils/vector';
 import normalizeData from '@/js/data/normalize';
 import useConfigStore from '@/stores/config-store';
+import Configuration from './components/Configuration';
 
 const onFileReaderLoad = (
 	event,
 	parser,
 	idColumn,
 	setHeaders,
+	setValidHeaders,
+	setSelectedHeaders,
 	setOriginalData,
 	setNomalizedData,
 	setVectors
@@ -43,6 +46,8 @@ const onFileReaderLoad = (
 			validHeaders.push(column);
 		}
 	}
+	setValidHeaders(validHeaders);
+	setSelectedHeaders(validHeaders);
 
 	// 2. Construir los vectores con las columnas que tienen valores numericos
 	const vectors = [];
@@ -80,11 +85,13 @@ function App() {
 	const [isOpen, setIsOpen] = useState(false);
 	const inputFileRef = useRef();
 
-	const headers = useStarCoordinatesStore((state) => state.headers);
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
-	const normalizedData = useStarCoordinatesStore(
-		(state) => state.normalizedData
+	const setValidHeaders = useStarCoordinatesStore(
+		(state) => state.setValidHeaders
 	);
+	const setSelectedHeaders = useStarCoordinatesStore(
+		(state) => state.setSelectedHeaders
+	);
+	const originalData = useStarCoordinatesStore((state) => state.originalData);
 	const setHeaders = useStarCoordinatesStore((state) => state.setHeaders);
 	const setOriginalData = useStarCoordinatesStore(
 		(state) => state.setOriginalData
@@ -102,6 +109,8 @@ function App() {
 			parseCsv,
 			idColumn,
 			setHeaders,
+			setValidHeaders,
+			setSelectedHeaders,
 			setOriginalData,
 			setNormalizedData,
 			setVectors
@@ -133,7 +142,9 @@ function App() {
 				title="Configuration"
 				onClose={() => setIsOpen(false)}
 				open={isOpen}
-			/>
+			>
+				<Configuration />
+			</Drawer>
 			<input
 				ref={inputFileRef}
 				type="file"
