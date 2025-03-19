@@ -31,7 +31,6 @@ const createVectors = (selectedHeaders) => {
 };
 
 function StarCoordinates({ height, width }) {
-	const updateVector = useStarCoordinatesStore((state) => state.updateVector);
 	const normalizedData = useStarCoordinatesStore(
 		(state) => state.normalizedData
 	);
@@ -89,7 +88,7 @@ function StarCoordinates({ height, width }) {
 			{vectors &&
 				vectors.map((vector) => (
 					<Axis
-						key={vector.lable}
+						key={vector.id + vectors.length}
 						vector={vector}
 						unitCircleRadius={unitCircleRadius}
 						updateVector={(newVector) =>
