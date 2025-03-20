@@ -3,9 +3,8 @@ import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import useDrag from '@/hooks/useDrag';
 import { buildCartesianVector } from '@/utils/vector';
-import useStarCoordinatesStore from '@/stores/star-coorditantes-store';
-import useConfigStore from '../stores/config-store';
 import { mod } from 'mathjs';
+import { Tooltip } from 'antd';
 
 const lineGenerator = line();
 
@@ -45,15 +44,23 @@ function Axis({ vector, unitCircleRadius, updateVector }) {
 	return (
 		<g>
 			<path d={lineGenerator(getPath({ x, y }))} stroke="gray" />
-			<path
-				ref={arrowheadRef}
-				d={lineGenerator(getArrowheadPath({ x, y }, arrowHeadScale))}
-				stroke="gray"
-				fill="gray"
-				transform={`rotate(${mod(360 - vec.polar.angle, 360)} ${x} ${y})`}
-			/>
+			<Tooltip title={vec.lable}>
+				<path
+					ref={arrowheadRef}
+					d={lineGenerator(getArrowheadPath({ x, y }, arrowHeadScale))}
+					stroke="gray"
+					fill="gray"
+					transform={`rotate(${mod(360 - vec.polar.angle, 360)} ${x} ${y})`}
+				/>
+			</Tooltip>
 		</g>
 	);
 }
+
+Axis.propTypes = {
+	vector: PropTypes.array.isRequired,
+	unitCircleRadius: PropTypes.number.isRequired,
+	updateVector: PropTypes.func.isRequired,
+};
 
 export default Axis;
