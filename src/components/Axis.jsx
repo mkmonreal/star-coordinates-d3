@@ -1,23 +1,20 @@
 import { line } from 'd3';
 import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import useDrag from '../hooks/useDrag';
-import { buildCartesianVector } from '../utils/vector';
-import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import useDrag from '@/hooks/useDrag';
+import { buildCartesianVector } from '@/utils/vector';
+import useStarCoordinatesStore from '@/stores/star-coorditantes-store';
 import useConfigStore from '../stores/config-store';
-import { sin } from 'mathjs';
-import { unit } from 'mathjs';
-import { tan } from 'mathjs';
 import { mod } from 'mathjs';
 
 const lineGenerator = line();
 
-const getArrowheadPath = ({ x, y }) => [
-	[x - 15, y],
-	[x - 18, y + 6],
+const getArrowheadPath = ({ x, y }, ratio = 1) => [
+	[x - 15 * ratio, y],
+	[x - 18 * ratio, y + 6 * ratio],
 	[x, y],
-	[x - 18, y - 6],
-	[x - 15, y],
+	[x - 18 * ratio, y - 6 * ratio],
+	[x - 15 * ratio, y],
 ];
 
 const getPath = ({ x, y }) => [
@@ -25,10 +22,8 @@ const getPath = ({ x, y }) => [
 	[x, y],
 ];
 
-function Axis({ vector }) {
-	const updateVector = useStarCoordinatesStore((state) => state.updateVector);
-
-	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
+function Axis({ vector, unitCircleRadius, updateVector }) {
+	const arrowHeadScale = unitCircleRadius / 250;
 
 	const [vec, setVec] = useState(vector);
 
@@ -52,10 +47,10 @@ function Axis({ vector }) {
 			<path d={lineGenerator(getPath({ x, y }))} stroke="gray" />
 			<path
 				ref={arrowheadRef}
-				d={lineGenerator(getArrowheadPath({ x, y }))}
+				d={lineGenerator(getArrowheadPath({ x, y }, arrowHeadScale))}
 				stroke="gray"
 				fill="gray"
-				transform={`rotate(${mod(360 - vec.polar.angle, 360)}, ${x}, ${y})`}
+				transform={`rotate(${mod(360 - vec.polar.angle, 360)} ${x} ${y})`}
 			/>
 		</g>
 	);

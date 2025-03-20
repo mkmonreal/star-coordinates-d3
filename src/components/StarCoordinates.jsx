@@ -9,14 +9,33 @@ import Axis from './Axis';
 import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
+import { buildPolarVector } from '../utils/vector';
+import { useEffect } from 'react';
+
+const createVectors = (selectedHeaders) => {
+	if (!selectedHeaders || selectedHeaders.length === 0) {
+		return;
+	}
+
+	const vectors = [];
+	const angleDiff = 360 / selectedHeaders.length;
+
+	for (const [index, validHeader] of selectedHeaders.entries()) {
+		const module = 1;
+		const angle = index * angleDiff;
+		const vector = buildPolarVector(module, angle, validHeader, validHeader);
+		vectors.push(vector);
+	}
+
+	return vectors;
+};
 
 function StarCoordinates({ height, width }) {
-	const vectors = useStarCoordinatesStore((state) => state.vectors);
-	const headers = useStarCoordinatesStore((state) => state.headers);
-	const validHeaders = useStarCoordinatesStore((state) => state.validHeaders);
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
 	const normalizedData = useStarCoordinatesStore(
 		(state) => state.normalizedData
+	);
+	const selectedHeaders = useStarCoordinatesStore(
+		(state) => state.selectedHeaders
 	);
 
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
@@ -40,6 +59,12 @@ function StarCoordinates({ height, width }) {
 	const [minX, setMinX] = useState(-centerX);
 	const [minY, setMinY] = useState(-centerY);
 
+	const [vectors, setVectors] = useState();
+
+	useEffect(() => {
+		setVectors(createVectors(selectedHeaders));
+	}, [selectedHeaders]);
+
 	const svgRef = useRef();
 	useDrag(svgRef, (event) => {
 		setMinX((prevMinX) => prevMinX - event.dx);
@@ -61,7 +86,18 @@ function StarCoordinates({ height, width }) {
 				fill="none"
 			/>
 			{vectors &&
-				vectors.map((vector) => <Axis key={vector.lable} vector={vector} />)}
+				vectors.map((vector) => (
+					<Axis
+						key={vector.id + vectors.length}
+						vector={vector}
+						unitCircleRadius={unitCircleRadius}
+						updateVector={(newVector) =>
+							setVectors((prev) =>
+								prev.map((vec) => (vec.id === newVector.id ? newVector : vec))
+							)
+						}
+					/>
+				))}
 
 			<g>
 				{normalizedData &&
@@ -73,6 +109,7 @@ function StarCoordinates({ height, width }) {
 							stroke={stroke}
 							fill={fill}
 							unitCircleRadius={unitCircleRadius}
+							vectors={vectors}
 						/>
 					))}
 			</g>

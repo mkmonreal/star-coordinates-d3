@@ -3,12 +3,22 @@ import { create } from 'zustand';
 const useStarCoordinatesStore = create((set, get) => ({
 	headers: [],
 	validHeaders: [],
+	selectedHeaders: [],
 	originalData: [],
 	processedData: [],
 	normalizedData: [],
 	vectors: [],
 	setHeaders: (headers) => set({ headers }),
 	setValidHeaders: (validHeaders) => set({ validHeaders }),
+	setSelectedHeaders: (selectedHeaders) => set({ selectedHeaders }),
+	addSelectedHeader: (selectedHeader) =>
+		set({ selectedHeaders: [...get().selectedHeaders, selectedHeader] }),
+	removeSelectedHeader: (selectedHeader) =>
+		set({
+			selectedHeaders: get().selectedHeaders.filter(
+				(header) => header !== selectedHeader
+			),
+		}),
 	setOriginalData: (originalData) => set({ originalData }),
 	setProcessedData: (processedData) => set({ processedData }),
 	hasOriginalData: () => get().originalData.size > 0,
