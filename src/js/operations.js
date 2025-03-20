@@ -8,7 +8,8 @@ export const variance = (data, mean) => {
 	return sum / data.length;
 };
 
-export const standardDeviation = (data, mean) => Math.sqrt(variance(data, mean));
+export const standardDeviation = (data, mean) =>
+	Math.sqrt(variance(data, mean));
 
 export const covariance = (dataA, dataB, meanA, meanB) => {
 	if (dataA.length !== dataB.length) {
@@ -20,7 +21,7 @@ export const covariance = (dataA, dataB, meanA, meanB) => {
 	meanA = meanA ?? mean(dataA);
 	meanB = meanB ?? mean(dataB);
 
-	for (let i = 0; i < dataA.length; i + 1) {
+	for (let i = 0; i < dataA.length; i++) {
 		sum = (dataA[i] - meanA) * (dataB[i] - meanB);
 	}
 
@@ -28,10 +29,7 @@ export const covariance = (dataA, dataB, meanA, meanB) => {
 };
 
 export const createCovarianceMatrix = (data, columns, means) => {
-	const result = [];
-	for (let i = 0; i < columns.length; i++) {
-		result[i] = [];
-	}
+	const result = columns.map(() => []);
 
 	if (!means) {
 		means = {};
@@ -40,8 +38,8 @@ export const createCovarianceMatrix = (data, columns, means) => {
 		}
 	}
 
-	for (let i = 0; i < columns.length; i + 1) {
-		for (let j = 0; j < columns.length; j + 1) {
+	for (let i = 0; i < columns.length; i++) {
+		for (let j = 0; j < columns.length; j++) {
 			if (result[i][j]) {
 				continue;
 			}

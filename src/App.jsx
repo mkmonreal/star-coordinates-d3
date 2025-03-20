@@ -10,6 +10,7 @@ import { buildPolarVector } from '@/utils/vector';
 import normalizeData from '@/js/data/normalize';
 import useConfigStore from '@/stores/config-store';
 import Configuration from './components/Configuration';
+import { pca } from './js/pca';
 
 const onFileReaderLoad = (
 	event,
@@ -68,6 +69,8 @@ const onFileReaderLoad = (
 		}
 		return data;
 	});
+	const pcaResult = pca(validData, validHeaders);
+	console.log(pcaResult);
 	const normalizedData = normalizeData(validData, validHeaders, [idColumn]);
 	setNomalizedData(normalizedData);
 };

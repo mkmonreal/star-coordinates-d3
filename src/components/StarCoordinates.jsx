@@ -12,15 +12,15 @@ import useConfigStore from '../stores/config-store';
 import { buildPolarVector } from '../utils/vector';
 import { useEffect } from 'react';
 
-const createVectors = (selectedHeaders) => {
-	if (!selectedHeaders || selectedHeaders.length === 0) {
+const createVectors = (headers) => {
+	if (!headers || headers.length === 0) {
 		return;
 	}
 
 	const vectors = [];
-	const angleDiff = 360 / selectedHeaders.length;
+	const angleDiff = 360 / headers.length;
 
-	for (const [index, validHeader] of selectedHeaders.entries()) {
+	for (const [index, validHeader] of headers.entries()) {
 		const module = 1;
 		const angle = index * angleDiff;
 		const vector = buildPolarVector(module, angle, validHeader, validHeader);
@@ -88,7 +88,7 @@ function StarCoordinates({ height, width }) {
 			{vectors &&
 				vectors.map((vector) => (
 					<Axis
-						key={vector.id + vectors.length}
+						key={`${vector.id}_${vectors.length}`}
 						vector={vector}
 						unitCircleRadius={unitCircleRadius}
 						updateVector={(newVector) =>
