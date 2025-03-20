@@ -1,10 +1,19 @@
-import { Card } from 'antd';
 import ColumnsConfiguration from './ColumnsConfiguration';
+import { Tabs } from 'antd';
 
-function Configuration() {
+function Configuration({ idColumn }) {
 	return (
 		<>
-			<ColumnsConfiguration />
+			<Tabs
+				defaultActiveKey="column-config"
+				items={[
+					{
+						label: 'Columns configuration',
+						key: 'column-config',
+						children: <ColumnsConfiguration idColumn={idColumn} />,
+					},
+				]}
+			/>
 		</>
 	);
 }

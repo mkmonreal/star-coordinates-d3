@@ -143,7 +143,7 @@ function App() {
 				onClose={() => setIsOpen(false)}
 				open={isOpen}
 			>
-				<Configuration />
+				<Configuration idColumn={idColumn} />
 			</Drawer>
 			<input
 				ref={inputFileRef}
