@@ -5,7 +5,8 @@ const normalize = (value, min, max) => (value - min) / (max - min);
 
 const normalizeData = (data, headers, exclude) => {
 	let result = clone(data);
-	headers.forEach((header) => {
+
+	for (const header of headers) {
 		const values = result.map((x) => parseFloat(x[header]));
 		const ext = extent(values);
 		result = result.map((x) => {
@@ -16,7 +17,8 @@ const normalizeData = (data, headers, exclude) => {
 			newX[header] = normalize(newX[header], ext[0], ext[1]);
 			return newX;
 		});
-	});
+	}
+
 	return result;
 };
 

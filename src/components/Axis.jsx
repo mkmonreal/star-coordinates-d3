@@ -58,7 +58,7 @@ function Axis({ vector, unitCircleRadius, updateVector }) {
 }
 
 Axis.propTypes = {
-	vector: PropTypes.array.isRequired,
+	vector: PropTypes.object.isRequired,
 	unitCircleRadius: PropTypes.number.isRequired,
 	updateVector: PropTypes.func.isRequired,
 };

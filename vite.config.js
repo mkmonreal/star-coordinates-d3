@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { defineConfig } from 'vite';
@@ -6,6 +5,7 @@ import { defineConfig } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react()],
+	base: '/star-coordinates-d3/', // Adjust the base path for GitHub Pages
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
