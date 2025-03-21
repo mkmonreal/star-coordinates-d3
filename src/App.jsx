@@ -3,12 +3,12 @@ import './App.css';
 import { FloatButton, Drawer, Empty } from 'antd';
 import { SettingFilled, FileAddFilled } from '@ant-design/icons';
 import { useState, useRef } from 'react';
-import StarCoordinates from '@/components/StarCoordinates';
-import useStarCoordinatesStore from '@/stores/star-coorditantes-store';
-import parseCsv from '@/js/csv-parser';
-import { buildPolarVector } from '@/utils/vector';
-import normalizeData from '@/js/data/normalize';
-import useConfigStore from '@/stores/config-store';
+import StarCoordinates from './components/StarCoordinates';
+import useStarCoordinatesStore from './stores/star-coorditantes-store';
+import parseCsv from './js/csv-parser';
+import { buildPolarVector } from './utils/vector';
+import normalizeData from './js/data/normalize';
+import useConfigStore from './stores/config-store';
 import Configuration from './components/Configuration';
 import { pca } from './js/pca';
 

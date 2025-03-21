@@ -1,8 +1,8 @@
 import { line } from 'd3';
 import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import useDrag from '@/hooks/useDrag';
-import { buildCartesianVector } from '@/utils/vector';
+import useDrag from '../hooks/useDrag';
+import { buildCartesianVector } from '../utils/vector';
 import { mod } from 'mathjs';
 import { Tooltip } from 'antd';
 
