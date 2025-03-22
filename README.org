@@ -1,2 +1,49 @@
 * Star Coordinates D3.js
 
+** Overview
+Star Coordinates D3.js is a data visualization tool that uses the Star Coordinates technique to represent multidimensional data interactively. Built with React and D3.js, it allows users to upload datasets, configure axes, and explore data relationships visually.
+
+** Website
+You can view the live demo of this project on GitHub Pages: [[https://mkmonreal.github.io/star-coordinates-d3/][Star Coordinates D3.js Demo]]
+
+** Features
+- Upload CSV datasets for visualization.
+- Configure columns to be used as axes.
+- Interactive visualization with draggable axes and dynamic updates.
+- PCA (Principal Component Analysis) integration for dimensionality reduction.
+- Customizable visualization settings (e.g., colors, radius).
+
+** Getting Started
+1. Clone the repository:
+   #+BEGIN_SRC bash
+   git clone https://github.com/your-username/star-coordinates-d3.git
+   cd star-coordinates-d3
+   #+END_SRC
+
+2. Install dependencies:
+   #+BEGIN_SRC bash
+   pnpm install
+   #+END_SRC
+
+3. Start the development server:
+   #+BEGIN_SRC bash
+   pnpm dev
+   #+END_SRC
+
+4. Open your browser and navigate to `http://localhost:5173`.
+
+** Project Structure
+- `src/components`: React components for the UI (e.g., `StarCoordinates`, `ColumnsConfiguration`).
+- `src/js`: Utility functions (e.g., file readers, data normalization, PCA).
+- `public/datasets`: Example datasets for testing.
+- `src/stores`: State management using Zustand.
+
+** License
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+
+** Contributing
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+** Acknowledgments
+- Built with React, D3.js, and Zustand.
+- Inspired by the Star Coordinates visualization technique.
