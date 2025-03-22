@@ -105,7 +105,7 @@ function StarCoordinates({ height, width }) {
 						<DataCircle
 							key={value[idColumn]}
 							dataRow={value}
-							radius={4}
+							radius={(3 * unitCircleRadius) / 250}
 							stroke={stroke}
 							fill={fill}
 							unitCircleRadius={unitCircleRadius}
