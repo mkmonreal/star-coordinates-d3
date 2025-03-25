@@ -12,7 +12,5 @@ export const pca = (data, columns) => {
 	const covarianceMatrix = createCovarianceMatrix(standarizedData, columns);
 	const eigen = eigs(covarianceMatrix);
 
-	const result = eigen.eigenvectors.sort((a, b) => b.value - a.value);
-
-	return result;
+	return eigen.eigenvectors;
 };
