@@ -1,16 +1,18 @@
 import standarizeData from './data/standarize';
 import { createCovarianceMatrix } from './operations';
-import { eigs } from 'mathjs';
+import { eigs, subtract } from 'mathjs';
 
 const createPrincipalComponent = (eigen, index) => {
 	eigen.name = `PC${index}`;
 	return eigen;
 };
 
-export const pca = (data, columns) => {
-	const standarizedData = standarizeData(data, columns);
-	const covarianceMatrix = createCovarianceMatrix(standarizedData, columns);
+export const pca = (data) => {
+	const standarizedData = standarizeData(data);
+	const covarianceMatrix = createCovarianceMatrix(standarizedData);
 	const eigen = eigs(covarianceMatrix);
 
-	return eigen.eigenvectors;
+	return eigen.eigenvectors
+		.sort((a, b) => subtract(b.value, a.value))
+		.map(createPrincipalComponent);
 };

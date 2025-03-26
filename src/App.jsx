@@ -11,6 +11,7 @@ import normalizeData from './js/data/normalize';
 import useConfigStore from './stores/config-store';
 import Configuration from './components/Configuration';
 import { pca } from './js/pca';
+import { matrix, matrixFromColumns } from 'mathjs';
 
 const onFileReaderLoad = (
 	event,
@@ -69,7 +70,14 @@ const onFileReaderLoad = (
 		}
 		return data;
 	});
-	const pcaResult = pca(validData, validHeaders);
+
+	// 4. PCA
+	const dataMatrix = matrix(
+		matrixFromColumns(
+			...validHeaders.map((header) => validData.map((d) => d[header]))
+		)
+	);
+	const pcaResult = pca(dataMatrix);
 	console.log(pcaResult);
 	const normalizedData = normalizeData(validData, validHeaders, [idColumn]);
 	setNomalizedData(normalizedData);
