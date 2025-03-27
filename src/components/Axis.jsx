@@ -35,7 +35,7 @@ function Axis({ vector, unitCircleRadius, updateVector }) {
 		setVec((prevVec) => {
 			const x = prevVec.cartesian.x + e.dx / unitCircleRadius;
 			const y = prevVec.cartesian.y - e.dy / unitCircleRadius;
-			const newVec = buildCartesianVector(x, y, prevVec.lable, prevVec.id);
+			const newVec = buildCartesianVector(x, y, prevVec.label, prevVec.id);
 			updateVector(newVec);
 			return newVec;
 		});
@@ -44,7 +44,7 @@ function Axis({ vector, unitCircleRadius, updateVector }) {
 	return (
 		<g>
 			<path d={lineGenerator(getPath({ x, y }))} stroke="gray" />
-			<Tooltip title={vec.lable}>
+			<Tooltip title={vec.label}>
 				<path
 					ref={arrowheadRef}
 					d={lineGenerator(getArrowheadPath({ x, y }, arrowHeadScale))}

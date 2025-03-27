@@ -3,34 +3,65 @@ import useConfigStore from '../stores/config-store';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { useEffect, useState } from 'react';
 import { Card } from 'antd';
+import NormalizationMethodEnum from '../enums/normalization-method-enum';
 
-const options = Object.values(
+const dimensionalityReductionOptions = Object.values(
 	dimensionalityReductionStatisticalTechniquesEnum
 ).map((option) => ({
 	label: option,
 	value: option,
 }));
 
+const normalizationMethodOptions = Object.values(NormalizationMethodEnum).map(
+	(option) => ({
+		label: option,
+		value: option,
+	})
+);
+
 const AnalysisConfiguration = () => {
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
+	const setNormalizationMethod = useConfigStore(
+		(state) => state.setNormalizationMethod
+	);
 
-	const [value, setValue] = useState(options[0].value);
+	const [normalization, setNormalization] = useState(
+		normalizationMethodOptions[0].value
+	);
+	const [dimensionalityReduction, setDimensionalityReduction] = useState(
+		dimensionalityReductionOptions[0].value
+	);
 
 	useEffect(() => {
-		setAnalysis(value);
-	}, [value, setAnalysis]);
+		setNormalizationMethod(normalization);
+	}, [normalization, setNormalizationMethod]);
+
+	useEffect(() => {
+		setAnalysis(dimensionalityReduction);
+	}, [dimensionalityReduction, setAnalysis]);
 
 	return (
 		<>
+			<Card title="Normalization method">
+				<Radio.Group
+					block
+					value={normalization}
+					options={normalizationMethodOptions}
+					defaultValue={normalizationMethodOptions[0].value}
+					optionType="button"
+					buttonStyle="solid"
+					onChange={(e) => setNormalization(e.target.value)}
+				></Radio.Group>
+			</Card>
 			<Card title="Dimensionality reduction">
 				<Radio.Group
 					block
-					value={value}
-					options={options}
-					defaultValue={options[0].value}
+					value={dimensionalityReduction}
+					options={dimensionalityReductionOptions}
+					defaultValue={dimensionalityReductionOptions[0].value}
 					optionType="button"
 					buttonStyle="solid"
-					onChange={(e) => setValue(e.target.value)}
+					onChange={(e) => setDimensionalityReduction(e.target.value)}
 				></Radio.Group>
 			</Card>
 		</>

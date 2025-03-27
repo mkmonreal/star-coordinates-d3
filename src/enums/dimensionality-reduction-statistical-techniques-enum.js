@@ -1,7 +1,7 @@
-const DimensionalityReductionStatisticalTechniquesEnum = {
-	None: 'None',
+const DimensionalityReductionStatisticalTechniquesEnum = Object.freeze({
+	NONE: 'None',
 	PCA: 'PCA',
 	LDA: 'LDA',
-};
+});
 
-export default Object.freeze(DimensionalityReductionStatisticalTechniquesEnum);
+export default DimensionalityReductionStatisticalTechniquesEnum;
