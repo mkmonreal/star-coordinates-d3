@@ -1,8 +1,7 @@
-import { Radio } from 'antd';
+import { Radio , Card } from 'antd';
 import useConfigStore from '../stores/config-store';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { useEffect, useState } from 'react';
-import { Card } from 'antd';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 
 const dimensionalityReductionOptions = Object.values(

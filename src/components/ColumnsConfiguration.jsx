@@ -1,8 +1,6 @@
-import { Checkbox } from 'antd';
+import { Checkbox , Flex , Select } from 'antd';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import { Flex } from 'antd';
 import useConfigStore from '../stores/config-store';
-import { Select } from 'antd';
 import { useState } from 'react';
 
 const onChange = (onCheck, onUncheck, e, column) => {

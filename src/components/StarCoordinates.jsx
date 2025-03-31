@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState , useEffect } from 'react';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
@@ -10,28 +10,30 @@ import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
 import { buildCartesianVector, buildPolarVector } from '../utils/vector';
-import { useEffect } from 'react';
-import { matrix, matrixFromColumns } from 'mathjs';
+import { matrix, matrixFromColumns , row } from 'mathjs';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { pca } from '../js/pca';
-import { multiply } from 'mathjs';
-import { row } from 'mathjs';
 
-const createVectors = (headers) => {
-	if (!headers || headers.length === 0) {
+const createVectors = (columns) => {
+	if (!columns || columns.length === 0) {
 		return;
 	}
 
 	const vectors = [];
-	const angleDiff = 360 / headers.length;
+	const angleDiff = 360 / columns.length;
 
-	for (const [index, validHeader] of headers.entries()) {
+	for (const [index, validHeader] of columns.entries()) {
 		const module = 1;
 		const angle = index * angleDiff;
-		const vector = buildPolarVector(module, angle, validHeader, validHeader);
+		const vector = buildPolarVector(
+			module,
+			angle,
+			validHeader,
+			`${validHeader}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.NONE}`
+		);
 		vectors.push(vector);
 	}
 
@@ -100,11 +102,16 @@ function StarCoordinates({ height, width }) {
 			const newVectorsMatrix = matrix(
 				matrixFromColumns(pc1.vector, pc2.vector)
 			);
-			newVectors = vectors.map((vector) => {
-				const index = columnsDict[vector.label];
+			newVectors = selectedColumns.map((selectedColumn, _, selectedColumns) => {
+				const index = columnsDict[selectedColumn];
 				const vectorMatrix = row(newVectorsMatrix, index);
 				const [x, y] = vectorMatrix.toArray()[0];
-				const newVector = buildCartesianVector(x, y, vector.label, vector.id);
+				const newVector = buildCartesianVector(
+					x,
+					y,
+					selectedColumn,
+					`${selectedColumn}_${selectedColumns.length}_${analysis}`
+				);
 				return newVector;
 			});
 		}
@@ -165,7 +172,7 @@ function StarCoordinates({ height, width }) {
 			{vectors &&
 				vectors.map((vector) => (
 					<Axis
-						key={`${vector.id}_${vectors.length}_${analysis}`}
+						key={vector.id}
 						vector={vector}
 						unitCircleRadius={unitCircleRadius}
 						updateVector={(newVector) =>
