@@ -1,34 +1,31 @@
-import clone from '../utils';
-
-const sumarize = (data) => data.reduce((x, y) => x + y);
-
-const mean = (data) => sumarize(data) / data.length;
-
-const variance = (data, meanValue) => {
-  const sum = data.reduce((x, y) => x + (y - meanValue) ** 2);
-  return sum / data.length;
-};
-
-const standardDeviation = (data, meanValue) => Math.sqrt(variance(data, meanValue));
+import { column, std, mean, isDenseMatrix, divide, subtract } from 'mathjs';
 
 function standarize(value, meanValue, standardDeviationValue) {
-  return (value - meanValue) / standardDeviationValue;
+	return divide(subtract(value, meanValue), standardDeviationValue);
 }
 
-const standarizeData = (data, headers) => {
-  let result = clone(data);
-  headers.forEach((header) => {
-    const values = result.map((x) => parseFloat(x[header]));
-    const meanValue = mean(values);
-    const standardDeviationValue = standardDeviation(values, meanValue);
+const standarizeData = (data) => {
+	if (!isDenseMatrix(data)) {
+		console.error('Data is not a matrix');
+		return;
+	}
 
-    result = result.map((x) => {
-      const newX = x;
-      newX[header] = standarize(parseFloat(newX[header]), meanValue, standardDeviationValue);
-      return newX;
-    });
-  });
-  return result;
+	const means = [];
+	const standardDeviations = [];
+	const [_, nCols] = data.size();
+
+	for (let i = 0; i < nCols; i++) {
+		const col = column(data, i);
+		means.push(mean(col));
+		standardDeviations.push(std(col));
+	}
+
+	const standarizedResult = data.map((value, index) => {
+		const [_, j] = index;
+		return standarize(value, means[j], standardDeviations[j]);
+	});
+
+	return standarizedResult;
 };
 
 export default standarizeData;

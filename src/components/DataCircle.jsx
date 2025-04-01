@@ -1,14 +1,25 @@
 import Circle from './Circle';
 
 function DataCircle({
-	dataRow,
+	matrixRow,
 	radius,
 	stroke,
 	fill,
 	unitCircleRadius,
 	vectors,
+	columnsDict,
 }) {
-	if (!vectors || vectors.length === 0) {
+	if (!columnsDict) {
+		return null;
+	}
+	const columns = Object.keys(columnsDict);
+	if (!columns || columns.length === 0) {
+		return null;
+	}
+	if (!vectors || vectors.length === 0 || vectors.length !== columns.length) {
+		return null;
+	}
+	if (!matrixRow) {
 		return null;
 	}
 
@@ -16,8 +27,14 @@ function DataCircle({
 	let cy = 0;
 
 	for (const vector of vectors) {
-		cx += dataRow[vector.lable] * vector.cartesian.x * unitCircleRadius;
-		cy += dataRow[vector.lable] * vector.cartesian.y * unitCircleRadius;
+		cx +=
+			matrixRow[columnsDict[vector.label]] *
+			vector.cartesian.x *
+			unitCircleRadius;
+		cy +=
+			matrixRow[columnsDict[vector.label]] *
+			vector.cartesian.y *
+			unitCircleRadius;
 	}
 
 	return (

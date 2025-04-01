@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
@@ -9,43 +9,69 @@ import Axis from './Axis';
 import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
-import { buildPolarVector } from '../utils/vector';
-import { useEffect } from 'react';
+import { buildCartesianVector, buildPolarVector } from '../utils/vector';
+import { matrix, matrixFromColumns, row } from 'mathjs';
+import normalizeData from '../js/data/normalize';
+import standarizeData from '../js/data/standarize';
+import NormalizationMethodEnum from '../enums/normalization-method-enum';
+import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
+import { pca } from '../js/pca';
+import useColumnsDictCreator from '../hooks/useColumnsDictCreator';
+import useNormalicedMatrixCreator from '../hooks/useNormalicedMatrixCreator';
+import useDataMatrixCreator from '../hooks/useDataMatrixCreator';
+import useVectorsCreator from '../hooks/useVectorsCreator';
 
-const createVectors = (headers) => {
-	if (!headers || headers.length === 0) {
+const createVectors = (columns) => {
+	if (!columns || columns.length === 0) {
 		return;
 	}
 
 	const vectors = [];
-	const angleDiff = 360 / headers.length;
+	const angleDiff = 360 / columns.length;
 
-	for (const [index, validHeader] of headers.entries()) {
+	for (const [index, validHeader] of columns.entries()) {
 		const module = 1;
 		const angle = index * angleDiff;
-		const vector = buildPolarVector(module, angle, validHeader, validHeader);
+		const vector = buildPolarVector(
+			module,
+			angle,
+			validHeader,
+			`${validHeader}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.NONE}`
+		);
 		vectors.push(vector);
 	}
 
 	return vectors;
 };
 
+const normalizationMethodSelector = (method) => {
+	switch (method) {
+		case NormalizationMethodEnum.MIN_MAX:
+			return normalizeData;
+		case NormalizationMethodEnum.Z_SCORE:
+			return standarizeData;
+		default:
+			return normalizeData;
+	}
+};
+
 function StarCoordinates({ height, width }) {
-	const normalizedData = useStarCoordinatesStore(
-		(state) => state.normalizedData
-	);
-	const selectedHeaders = useStarCoordinatesStore(
-		(state) => state.selectedHeaders
+	const originalData = useStarCoordinatesStore((state) => state.originalData);
+	const selectedColumns = useStarCoordinatesStore(
+		(state) => state.selectedColumns
 	);
 
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const fill = useConfigStore((state) => state.fill);
 	const stroke = useConfigStore((state) => state.stroke);
 	const idColumn = useConfigStore((state) => state.idColumn);
-
 	const setUnitCircleRadius = useConfigStore(
 		(state) => state.setUnitCircleRadius
 	);
+	const normalizationMethod = useConfigStore(
+		(state) => state.normalizationMethod
+	);
+	const analysis = useConfigStore((state) => state.analysis);
 
 	if (height > width) {
 		setUnitCircleRadius(width / 5);
@@ -60,10 +86,27 @@ function StarCoordinates({ height, width }) {
 	const [minY, setMinY] = useState(-centerY);
 
 	const [vectors, setVectors] = useState();
+	const [dataMatrix, setDataMatrix] = useState();
+	const [normalizedMatrix, setNormalizedMatrix] = useState();
+	const [columnsDict, setColumnsDict] = useState();
 
-	useEffect(() => {
-		setVectors(createVectors(selectedHeaders));
-	}, [selectedHeaders]);
+	useColumnsDictCreator(setColumnsDict, selectedColumns);
+
+	useDataMatrixCreator(setDataMatrix, selectedColumns, originalData);
+
+	useNormalicedMatrixCreator(
+		setNormalizedMatrix,
+		normalizationMethodSelector(normalizationMethod),
+		dataMatrix
+	);
+
+	useVectorsCreator(
+		createVectors,
+		setVectors,
+		analysis,
+		columnsDict,
+		dataMatrix
+	);
 
 	const svgRef = useRef();
 	useDrag(svgRef, (event) => {
@@ -88,7 +131,7 @@ function StarCoordinates({ height, width }) {
 			{vectors &&
 				vectors.map((vector) => (
 					<Axis
-						key={`${vector.id}_${vectors.length}`}
+						key={vector.id}
 						vector={vector}
 						unitCircleRadius={unitCircleRadius}
 						updateVector={(newVector) =>
@@ -100,18 +143,21 @@ function StarCoordinates({ height, width }) {
 				))}
 
 			<g>
-				{normalizedData &&
-					normalizedData.map((value) => (
-						<DataCircle
-							key={value[idColumn]}
-							dataRow={value}
-							radius={(3 * unitCircleRadius) / 250}
-							stroke={stroke}
-							fill={fill}
-							unitCircleRadius={unitCircleRadius}
-							vectors={vectors}
-						/>
-					))}
+				{normalizedMatrix &&
+					normalizedMatrix
+						.toArray()
+						.map((value, index) => (
+							<DataCircle
+								key={index}
+								matrixRow={value}
+								radius={(3 * unitCircleRadius) / 250}
+								stroke={stroke}
+								fill={fill}
+								unitCircleRadius={unitCircleRadius}
+								vectors={vectors}
+								columnsDict={columnsDict}
+							/>
+						))}
 			</g>
 		</svg>
 	);

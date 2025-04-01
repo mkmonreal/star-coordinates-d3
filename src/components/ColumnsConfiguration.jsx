@@ -1,8 +1,6 @@
-import { Checkbox } from 'antd';
+import { Checkbox , Flex , Select } from 'antd';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import { Flex } from 'antd';
 import useConfigStore from '../stores/config-store';
-import { Select } from 'antd';
 import { useState } from 'react';
 
 const onChange = (onCheck, onUncheck, e, column) => {
@@ -16,21 +14,21 @@ const onChange = (onCheck, onUncheck, e, column) => {
 function ColumnsConfiguration({ idColumn }) {
 	const setIdColumn = useConfigStore((state) => state.setIdColumn);
 
-	const validHeaders = useStarCoordinatesStore((state) => state.validHeaders);
-	const selectedHeaders = useStarCoordinatesStore(
-		(state) => state.selectedHeaders
+	const validColumns = useStarCoordinatesStore((state) => state.validColumns);
+	const selectedColumns = useStarCoordinatesStore(
+		(state) => state.selectedColumns
 	);
 	const addSelectedHeader = useStarCoordinatesStore(
-		(state) => state.addSelectedHeader
+		(state) => state.addSelectedColumn
 	);
-	const removeSelectedHeader = useStarCoordinatesStore(
-		(state) => state.removeSelectedHeader
+	const removeSelectedColumn = useStarCoordinatesStore(
+		(state) => state.removeSelectedColumn
 	);
 
-	const [showNotSelectedHeaders, setShowNotSelectedHeaders] = useState(false);
+	const [showNotSelectedColumns, setShowNotSelectedColumns] = useState(false);
 
-	const notSelectedHeaders = validHeaders.filter(
-		(header) => !selectedHeaders.includes(header)
+	const notSelectedHeaders = validColumns.filter(
+		(column) => !selectedColumns.includes(column)
 	);
 
 	return (
@@ -38,13 +36,13 @@ function ColumnsConfiguration({ idColumn }) {
 			<Flex gap="large" vertical>
 				<Flex gap="small" style={{ width: '100%' }}>
 					<h3>Id column:</h3>
-					{validHeaders && (
+					{validColumns && (
 						<Select
 							onChange={(value) => setIdColumn(value)}
 							value={idColumn}
 							style={{ flex: 1 }}
 						>
-							{validHeaders.map((header) => (
+							{validColumns.map((header) => (
 								<Select.Option key={header} value={header}>
 									{header}
 								</Select.Option>
@@ -53,8 +51,8 @@ function ColumnsConfiguration({ idColumn }) {
 					)}
 				</Flex>
 				<Flex gap="small" vertical>
-					{selectedHeaders &&
-						selectedHeaders
+					{selectedColumns &&
+						selectedColumns
 							.sort((columnA, columnB) => {
 								return columnA.localeCompare(columnB);
 							})
@@ -62,7 +60,7 @@ function ColumnsConfiguration({ idColumn }) {
 								<Checkbox
 									key={column}
 									onChange={(e) =>
-										onChange(addSelectedHeader, removeSelectedHeader, e, column)
+										onChange(addSelectedHeader, removeSelectedColumn, e, column)
 									}
 									checked={true}
 								>
@@ -71,13 +69,13 @@ function ColumnsConfiguration({ idColumn }) {
 							))}
 					{notSelectedHeaders && notSelectedHeaders.length > 0 && (
 						<a
-							onClick={() => setShowNotSelectedHeaders(!showNotSelectedHeaders)}
+							onClick={() => setShowNotSelectedColumns(!showNotSelectedColumns)}
 						>
-							{showNotSelectedHeaders ? '-' : '+'} Not selected headers
+							{showNotSelectedColumns ? '-' : '+'} Not selected columns
 						</a>
 					)}
 
-					{showNotSelectedHeaders &&
+					{showNotSelectedColumns &&
 						notSelectedHeaders
 							.sort((columnA, columnB) => {
 								return columnA.localeCompare(columnB);
@@ -86,7 +84,7 @@ function ColumnsConfiguration({ idColumn }) {
 								<Checkbox
 									key={column}
 									onChange={(e) =>
-										onChange(addSelectedHeader, removeSelectedHeader, e, column)
+										onChange(addSelectedHeader, removeSelectedColumn, e, column)
 									}
 								>
 									{column}

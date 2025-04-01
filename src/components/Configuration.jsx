@@ -1,4 +1,5 @@
 import ColumnsConfiguration from './ColumnsConfiguration';
+import AnalysisConfiguration from './AnalysisConfiguration';
 import { Tabs } from 'antd';
 
 function Configuration({ idColumn }) {
@@ -11,6 +12,11 @@ function Configuration({ idColumn }) {
 						label: 'Columns configuration',
 						key: 'column-config',
 						children: <ColumnsConfiguration idColumn={idColumn} />,
+					},
+					{
+						label: 'Analysis configuration',
+						key: 'analysis-config',
+						children: <AnalysisConfiguration />,
 					},
 				]}
 			/>

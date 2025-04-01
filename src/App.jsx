@@ -6,32 +6,26 @@ import { useState, useRef } from 'react';
 import StarCoordinates from './components/StarCoordinates';
 import useStarCoordinatesStore from './stores/star-coorditantes-store';
 import parseCsv from './js/csv-parser';
-import { buildPolarVector } from './utils/vector';
-import normalizeData from './js/data/normalize';
 import useConfigStore from './stores/config-store';
 import Configuration from './components/Configuration';
-import { pca } from './js/pca';
 
 const onFileReaderLoad = (
 	event,
 	parser,
-	idColumn,
-	setHeaders,
-	setValidHeaders,
-	setSelectedHeaders,
 	setOriginalData,
-	setNomalizedData,
-	setVectors
+	setColumns,
+	setValidColumns,
+	setSelectedColumns
 ) => {
 	const result = event.target?.result;
 	const csv = parser(result);
 	const { columns } = csv;
 
-	setHeaders(columns);
+	setColumns(columns);
 	setOriginalData(csv);
 
 	// 1. Sacar las columnas que solo tienen valores numericos
-	const validHeaders = [];
+	const validColumns = [];
 	const incompleteColumn = [];
 	for (const column of columns) {
 		const columnWithoutNull = csv
@@ -44,35 +38,16 @@ const onFileReaderLoad = (
 			.map((d) => parseFloat(d))
 			.filter((d) => !isNaN(d));
 		if (numericData.length === columnWithoutNull.length) {
-			validHeaders.push(column);
+			validColumns.push(column);
 		}
 	}
-	setValidHeaders(validHeaders);
-	setSelectedHeaders(validHeaders);
+	setValidColumns(validColumns);
+	setSelectedColumns(validColumns);
 
-	// 2. Construir los vectores con las columnas que tienen valores numericos
-	const vectors = [];
-	const angleDiff = 360 / validHeaders.length;
-	for (const [index, validHeader] of validHeaders.entries()) {
-		const module = 1;
-		const angle = index * angleDiff;
-		const vector = buildPolarVector(module, angle, validHeader, validHeader);
-		vectors.push(vector);
-	}
-	setVectors(vectors);
+	// 2. Crear los vectores. NO ES NECESARIO
 
-	// 3. Normalizar los datos
-	const validData = csv.map((d) => {
-		const data = {};
-		for (const validHeader of validHeaders) {
-			data[validHeader] = parseFloat(d[validHeader]);
-		}
-		return data;
-	});
-	const pcaResult = pca(validData, validHeaders);
-	console.log(pcaResult);
-	const normalizedData = normalizeData(validData, validHeaders, [idColumn]);
-	setNomalizedData(normalizedData);
+	// 3. Normalizar los datos. NO ES NECESARIO
+	// 3.1. Crear la matriz de datos
 };
 
 const onFileInputChange = (event, onLoad) => {
@@ -88,40 +63,35 @@ function App() {
 	const [isOpen, setIsOpen] = useState(false);
 	const inputFileRef = useRef();
 
-	const setValidHeaders = useStarCoordinatesStore(
-		(state) => state.setValidHeaders
-	);
-	const setSelectedHeaders = useStarCoordinatesStore(
-		(state) => state.setSelectedHeaders
-	);
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
-	const setHeaders = useStarCoordinatesStore((state) => state.setHeaders);
+	const idColumn = useConfigStore((state) => state.idColumn);
+
+	const validColumns = useStarCoordinatesStore((state) => state.validColumns);
 	const setOriginalData = useStarCoordinatesStore(
 		(state) => state.setOriginalData
 	);
-	const setNormalizedData = useStarCoordinatesStore(
-		(state) => state.setNormalizedData
+	const setColumns = useStarCoordinatesStore((state) => state.setColumns);
+	const setValidColumns = useStarCoordinatesStore(
+		(state) => state.setValidColumns
 	);
-	const setVectors = useStarCoordinatesStore((state) => state.setVectors);
-
-	const idColumn = useConfigStore((state) => state.idColumn);
+	const setSelectedColumns = useStarCoordinatesStore(
+		(state) => state.setSelectedColumns
+	);
 
 	const fileReaderFunc = (ev) =>
 		onFileReaderLoad(
 			ev,
 			parseCsv,
-			idColumn,
-			setHeaders,
-			setValidHeaders,
-			setSelectedHeaders,
 			setOriginalData,
-			setNormalizedData,
-			setVectors
+			setColumns,
+			setValidColumns,
+			setSelectedColumns
 		);
+
 	const fileChangeFunc = (ev) => onFileInputChange(ev, fileReaderFunc);
+
 	return (
 		<>
-			{originalData.length ? (
+			{validColumns.length ? (
 				<StarCoordinates width={width} height={height} />
 			) : (
 				<Empty />

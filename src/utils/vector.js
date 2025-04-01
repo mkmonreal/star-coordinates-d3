@@ -17,10 +17,10 @@ const addPolar = (vector) => {
 	return vector;
 };
 
-const buildPolarVector = (module, angle, lable, id) => {
+const buildPolarVector = (module, angle, label, id) => {
 	const vector = {};
-	if (lable || lable === '') {
-		vector.lable = lable;
+	if (label || label === '') {
+		vector.label = label;
 	}
 	if (id || id === '') {
 		vector.id = id;
@@ -29,10 +29,10 @@ const buildPolarVector = (module, angle, lable, id) => {
 	return addCartesian(vector);
 };
 
-const buildCartesianVector = (x, y, lable, id) => {
+const buildCartesianVector = (x, y, label, id) => {
 	const vector = {};
-	if (lable || lable === '') {
-		vector.lable = lable;
+	if (label || label === '') {
+		vector.label = label;
 	}
 	if (id || id === '') {
 		vector.id = id;
@@ -41,8 +41,8 @@ const buildCartesianVector = (x, y, lable, id) => {
 	return addPolar(vector);
 };
 
-const addLable = (vector, lable) => {
-	vector.lable = lable;
+const addLable = (vector, label) => {
+	vector.label = label;
 	return vector;
 };
 

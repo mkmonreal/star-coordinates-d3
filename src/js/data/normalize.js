@@ -1,25 +1,31 @@
 import { extent } from 'd3';
-import clone from '../utils';
+import { isDenseMatrix, column, divide, subtract } from 'mathjs';
 
-const normalize = (value, min, max) => (value - min) / (max - min);
+const normalize = (value, min, max) =>
+	divide(subtract(value, min), subtract(max, min));
 
-const normalizeData = (data, headers, exclude) => {
-	let result = clone(data);
-
-	for (const header of headers) {
-		const values = result.map((x) => parseFloat(x[header]));
-		const ext = extent(values);
-		result = result.map((x) => {
-			// if (exclude && exclude.includes(header)) {
-			// 	return x;
-			// }
-			const newX = x;
-			newX[header] = normalize(newX[header], ext[0], ext[1]);
-			return newX;
-		});
+const normalizeData = (data) => {
+	if (!isDenseMatrix(data)) {
+		console.error('Data is not a matrix');
+		return;
 	}
 
-	return result;
+	const mins = [];
+	const maxs = [];
+	const [_, nCols] = data.size();
+	for (let ncol = 0; ncol < nCols; ncol++) {
+		const col = column(data, ncol);
+		const [min, max] = extent(col.toArray().flat());
+		mins.push(min);
+		maxs.push(max);
+	}
+
+	const normalizedData = data.map((value, index) => {
+		const [_, ncol] = index;
+		return normalize(value, mins[ncol], maxs[ncol]);
+	});
+
+	return normalizedData;
 };
 
 export default normalizeData;

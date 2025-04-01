@@ -34,6 +34,7 @@ export default [
 				'warn',
 				{ allowConstantExport: true },
 			],
+			...importPlugin.configs.recommended.rules,
 		},
 	},
 ];
