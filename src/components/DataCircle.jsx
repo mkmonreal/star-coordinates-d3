@@ -9,7 +9,14 @@ function DataCircle({
 	vectors,
 	columnsDict,
 }) {
-	if (!vectors || vectors.length === 0) {
+	if (!columnsDict) {
+		return null;
+	}
+	const columns = Object.keys(columnsDict);
+	if (!columns || columns.length === 0) {
+		return null;
+	}
+	if (!vectors || vectors.length === 0 || vectors.length !== columns.length) {
 		return null;
 	}
 	if (!matrixRow) {
@@ -18,10 +25,6 @@ function DataCircle({
 
 	let cx = 0;
 	let cy = 0;
-
-	if (isNaN(cx) || isNaN(cy)) {
-		return null;
-	}
 
 	for (const vector of vectors) {
 		cx +=

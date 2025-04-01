@@ -1,4 +1,4 @@
-import { Radio , Card } from 'antd';
+import { Radio, Card, Flex } from 'antd';
 import useConfigStore from '../stores/config-store';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { useEffect, useState } from 'react';
@@ -41,28 +41,30 @@ const AnalysisConfiguration = () => {
 
 	return (
 		<>
-			<Card title="Normalization method">
-				<Radio.Group
-					block
-					value={normalization}
-					options={normalizationMethodOptions}
-					defaultValue={normalizationMethodOptions[0].value}
-					optionType="button"
-					buttonStyle="solid"
-					onChange={(e) => setNormalization(e.target.value)}
-				></Radio.Group>
-			</Card>
-			<Card title="Dimensionality reduction">
-				<Radio.Group
-					block
-					value={dimensionalityReduction}
-					options={dimensionalityReductionOptions}
-					defaultValue={dimensionalityReductionOptions[0].value}
-					optionType="button"
-					buttonStyle="solid"
-					onChange={(e) => setDimensionalityReduction(e.target.value)}
-				></Radio.Group>
-			</Card>
+			<Flex vertical gap="middle">
+				<Card title="Normalization method">
+					<Radio.Group
+						block
+						value={normalization}
+						options={normalizationMethodOptions}
+						defaultValue={normalizationMethodOptions[0].value}
+						optionType="button"
+						buttonStyle="solid"
+						onChange={(e) => setNormalization(e.target.value)}
+					></Radio.Group>
+				</Card>
+				<Card title="Dimensionality reduction">
+					<Radio.Group
+						block
+						value={dimensionalityReduction}
+						options={dimensionalityReductionOptions}
+						defaultValue={dimensionalityReductionOptions[0].value}
+						optionType="button"
+						buttonStyle="solid"
+						onChange={(e) => setDimensionalityReduction(e.target.value)}
+					></Radio.Group>
+				</Card>
+			</Flex>
 		</>
 	);
 };

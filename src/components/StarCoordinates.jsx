@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState , useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
@@ -10,12 +10,16 @@ import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
 import { buildCartesianVector, buildPolarVector } from '../utils/vector';
-import { matrix, matrixFromColumns , row } from 'mathjs';
+import { matrix, matrixFromColumns, row } from 'mathjs';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { pca } from '../js/pca';
+import useColumnsDictCreator from '../hooks/useColumnsDictCreator';
+import useNormalicedMatrixCreator from '../hooks/useNormalicedMatrixCreator';
+import useDataMatrixCreator from '../hooks/useDataMatrixCreator';
+import useVectorsCreator from '../hooks/useVectorsCreator';
 
 const createVectors = (columns) => {
 	if (!columns || columns.length === 0) {
@@ -86,68 +90,23 @@ function StarCoordinates({ height, width }) {
 	const [normalizedMatrix, setNormalizedMatrix] = useState();
 	const [columnsDict, setColumnsDict] = useState();
 
-	useEffect(() => {
-		if (!selectedColumns || selectedColumns.length === 0) {
-			return;
-		}
-		let newVectors = [];
+	useColumnsDictCreator(setColumnsDict, selectedColumns);
 
-		if (DimensionalityReductionStatisticalTechniquesEnum.NONE === analysis) {
-			newVectors = createVectors(selectedColumns);
-		} else if (
-			DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis
-		) {
-			const { principalComponents } = pca(dataMatrix);
-			const [pc1, pc2] = principalComponents;
-			const newVectorsMatrix = matrix(
-				matrixFromColumns(pc1.vector, pc2.vector)
-			);
-			newVectors = selectedColumns.map((selectedColumn, _, selectedColumns) => {
-				const index = columnsDict[selectedColumn];
-				const vectorMatrix = row(newVectorsMatrix, index);
-				const [x, y] = vectorMatrix.toArray()[0];
-				const newVector = buildCartesianVector(
-					x,
-					y,
-					selectedColumn,
-					`${selectedColumn}_${selectedColumns.length}_${analysis}`
-				);
-				return newVector;
-			});
-		}
+	useDataMatrixCreator(setDataMatrix, selectedColumns, originalData);
 
-		setVectors(newVectors);
-	}, [analysis, selectedColumns, columnsDict, dataMatrix]);
+	useNormalicedMatrixCreator(
+		setNormalizedMatrix,
+		normalizationMethodSelector(normalizationMethod),
+		dataMatrix
+	);
 
-	useEffect(() => {
-		const newDataMatrix = matrix(
-			matrixFromColumns(
-				...selectedColumns.map((column) =>
-					originalData.map((d) => parseFloat(d[column]))
-				)
-			)
-		);
-		setDataMatrix(newDataMatrix);
-	}, [selectedColumns, originalData]);
-
-	useEffect(() => {
-		const normalizationMethodFunction =
-			normalizationMethodSelector(normalizationMethod);
-
-		setNormalizedMatrix(normalizationMethodFunction(dataMatrix));
-	}, [normalizationMethod, dataMatrix]);
-
-	useEffect(() => {
-		if (!selectedColumns || selectedColumns.length === 0) {
-			return;
-		}
-
-		const columnsDict = selectedColumns.reduce((acc, column, index) => {
-			acc[column] = index;
-			return acc;
-		}, {});
-		setColumnsDict(columnsDict);
-	}, [selectedColumns]);
+	useVectorsCreator(
+		createVectors,
+		setVectors,
+		analysis,
+		columnsDict,
+		dataMatrix
+	);
 
 	const svgRef = useRef();
 	useDrag(svgRef, (event) => {
