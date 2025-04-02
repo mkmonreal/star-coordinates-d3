@@ -1,4 +1,5 @@
 import Circle from './Circle';
+import PropTypes from 'prop-types';
 
 function DataCircle({
 	matrixRow,
@@ -41,5 +42,23 @@ function DataCircle({
 		<Circle cx={cx} cy={-cy} radius={radius} stroke={stroke} fill={fill} />
 	);
 }
+
+DataCircle.propTypes = {
+	matrixRow: PropTypes.array.isRequired,
+	radius: PropTypes.number.isRequired,
+	stroke: PropTypes.string.isRequired,
+	fill: PropTypes.string.isRequired,
+	unitCircleRadius: PropTypes.number.isRequired,
+	vectors: PropTypes.arrayOf(
+		PropTypes.shape({
+			label: PropTypes.string.isRequired,
+			cartesian: PropTypes.shape({
+				x: PropTypes.number.isRequired,
+				y: PropTypes.number.isRequired,
+			}).isRequired,
+		})
+	).isRequired,
+	columnsDict: PropTypes.object.isRequired,
+};
 
 export default DataCircle;

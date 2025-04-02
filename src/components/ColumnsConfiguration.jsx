@@ -1,4 +1,4 @@
-import { Checkbox , Flex , Select } from 'antd';
+import { Button, Checkbox, Flex, Select } from 'antd';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import useConfigStore from '../stores/config-store';
 import { useState } from 'react';
@@ -32,67 +32,65 @@ function ColumnsConfiguration({ idColumn }) {
 	);
 
 	return (
-		<>
-			<Flex gap="large" vertical>
-				<Flex gap="small" style={{ width: '100%' }}>
-					<h3>Id column:</h3>
-					{validColumns && (
-						<Select
-							onChange={(value) => setIdColumn(value)}
-							value={idColumn}
-							style={{ flex: 1 }}
-						>
-							{validColumns.map((header) => (
-								<Select.Option key={header} value={header}>
-									{header}
-								</Select.Option>
-							))}
-						</Select>
-					)}
-				</Flex>
-				<Flex gap="small" vertical>
-					{selectedColumns &&
-						selectedColumns
-							.sort((columnA, columnB) => {
-								return columnA.localeCompare(columnB);
-							})
-							.map((column) => (
-								<Checkbox
-									key={column}
-									onChange={(e) =>
-										onChange(addSelectedHeader, removeSelectedColumn, e, column)
-									}
-									checked={true}
-								>
-									{column}
-								</Checkbox>
-							))}
-					{notSelectedHeaders && notSelectedHeaders.length > 0 && (
-						<a
-							onClick={() => setShowNotSelectedColumns(!showNotSelectedColumns)}
-						>
-							{showNotSelectedColumns ? '-' : '+'} Not selected columns
-						</a>
-					)}
-
-					{showNotSelectedColumns &&
-						notSelectedHeaders
-							.sort((columnA, columnB) => {
-								return columnA.localeCompare(columnB);
-							})
-							.map((column) => (
-								<Checkbox
-									key={column}
-									onChange={(e) =>
-										onChange(addSelectedHeader, removeSelectedColumn, e, column)
-									}
-								>
-									{column}
-								</Checkbox>
-							))}
-				</Flex>
+		<Flex gap="large" vertical>
+			<Flex gap="small" style={{ width: '100%' }}>
+				<h3>Id column:</h3>
+				{validColumns && (
+					<Select
+						onChange={(value) => setIdColumn(value)}
+						value={idColumn}
+						style={{ flex: 1 }}
+					>
+						{validColumns.map((header) => (
+							<Select.Option key={header} value={header}>
+								{header}
+							</Select.Option>
+						))}
+					</Select>
+				)}
 			</Flex>
-		</>
+			<Flex gap="small" vertical>
+				{selectedColumns
+					.sort((columnA, columnB) => {
+						return columnA.localeCompare(columnB);
+					})
+					.map((column) => (
+						<Checkbox
+							key={column}
+							onChange={(e) =>
+								onChange(addSelectedHeader, removeSelectedColumn, e, column)
+							}
+							checked={true}
+						>
+							{column}
+						</Checkbox>
+					))}
+				{notSelectedHeaders && notSelectedHeaders.length > 0 && (
+					<Button
+						type="link"
+						onClick={() => setShowNotSelectedColumns(!showNotSelectedColumns)}
+					>
+						{showNotSelectedColumns ? '-' : '+'} Not selected columns
+					</Button>
+				)}
+
+				{showNotSelectedColumns &&
+					notSelectedHeaders
+						.sort((columnA, columnB) => {
+							return columnA.localeCompare(columnB);
+						})
+						.map((column) => (
+							<Checkbox
+								key={column}
+								onChange={(e) =>
+									onChange(addSelectedHeader, removeSelectedColumn, e, column)
+								}
+							>
+								{column}
+							</Checkbox>
+						))}
+			</Flex>
+		</Flex>
 	);
 }
 
