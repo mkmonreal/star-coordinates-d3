@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
@@ -9,13 +9,11 @@ import Axis from './Axis';
 import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
-import { buildCartesianVector, buildPolarVector } from '../utils/vector';
-import { matrix, matrixFromColumns, row } from 'mathjs';
+import { buildPolarVector } from '../utils/vector';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
-import { pca } from '../js/pca';
 import useColumnsDictCreator from '../hooks/useColumnsDictCreator';
 import useNormalicedMatrixCreator from '../hooks/useNormalicedMatrixCreator';
 import useDataMatrixCreator from '../hooks/useDataMatrixCreator';
@@ -128,39 +126,40 @@ function StarCoordinates({ height, width }) {
 				stroke="grey"
 				fill="none"
 			/>
-			{vectors &&
-				vectors.map((vector) => (
-					<Axis
-						key={vector.id}
-						vector={vector}
-						unitCircleRadius={unitCircleRadius}
-						updateVector={(newVector) =>
-							setVectors((prev) =>
-								prev.map((vec) => (vec.id === newVector.id ? newVector : vec))
-							)
-						}
-					/>
-				))}
+			{vectors?.map((vector) => (
+				<Axis
+					key={vector.id}
+					vector={vector}
+					unitCircleRadius={unitCircleRadius}
+					updateVector={(newVector) =>
+						setVectors((prev) =>
+							prev.map((vec) => (vec.id === newVector.id ? newVector : vec))
+						)
+					}
+				/>
+			))}
 
 			<g>
-				{normalizedMatrix &&
-					normalizedMatrix
-						.toArray()
-						.map((value, index) => (
-							<DataCircle
-								key={index}
-								matrixRow={value}
-								radius={(3 * unitCircleRadius) / 250}
-								stroke={stroke}
-								fill={fill}
-								unitCircleRadius={unitCircleRadius}
-								vectors={vectors}
-								columnsDict={columnsDict}
-							/>
-						))}
+				{normalizedMatrix?.toArray().map((value, index) => (
+					<DataCircle
+						key={index}
+						matrixRow={value}
+						radius={(3 * unitCircleRadius) / 250}
+						stroke={stroke}
+						fill={fill}
+						unitCircleRadius={unitCircleRadius}
+						vectors={vectors}
+						columnsDict={columnsDict}
+					/>
+				))}
 			</g>
 		</svg>
 	);
 }
+
+StarCoordinates.propTypes = {
+	height: PropTypes.number.isRequired,
+	width: PropTypes.number.isRequired,
+};
 
 export default StarCoordinates;

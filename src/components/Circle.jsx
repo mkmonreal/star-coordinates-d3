@@ -18,4 +18,12 @@ function Circle({
 	return <circle cx={cx} cy={cy} r={radius} stroke={stroke} fill={fill} />;
 }
 
+Circle.propTypes = {
+	cx: PropTypes.number.isRequired,
+	cy: PropTypes.number.isRequired,
+	radius: PropTypes.number.isRequired,
+	stroke: PropTypes.string,
+	fill: PropTypes.string,
+};
+
 export default Circle;
