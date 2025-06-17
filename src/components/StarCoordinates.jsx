@@ -18,6 +18,7 @@ import useColumnsDictCreator from '../hooks/useColumnsDictCreator';
 import useNormalicedMatrixCreator from '../hooks/useNormalicedMatrixCreator';
 import useDataMatrixCreator from '../hooks/useDataMatrixCreator';
 import useVectorsCreator from '../hooks/useVectorsCreator';
+import useClassesMatrixexCreator from '../hooks/useClassesMatrixesCreator';
 
 const createVectors = (columns) => {
 	if (!columns || columns.length === 0) {
@@ -58,6 +59,9 @@ function StarCoordinates({ height, width }) {
 	const selectedColumns = useStarCoordinatesStore(
 		(state) => state.selectedColumns
 	);
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
 
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const fill = useConfigStore((state) => state.fill);
@@ -87,6 +91,7 @@ function StarCoordinates({ height, width }) {
 	const [dataMatrix, setDataMatrix] = useState();
 	const [normalizedMatrix, setNormalizedMatrix] = useState();
 	const [columnsDict, setColumnsDict] = useState();
+	const [classesMatrixesMap, setClassesMatrixesMap] = useState();
 
 	useColumnsDictCreator(setColumnsDict, selectedColumns);
 
@@ -98,12 +103,21 @@ function StarCoordinates({ height, width }) {
 		dataMatrix
 	);
 
+	useClassesMatrixexCreator(
+		setClassesMatrixesMap,
+		analysis,
+		selectedClassColumn,
+		selectedColumns,
+		originalData
+	);
+
 	useVectorsCreator(
 		createVectors,
 		setVectors,
 		analysis,
 		columnsDict,
-		dataMatrix
+		dataMatrix,
+		classesMatrixesMap
 	);
 
 	const svgRef = useRef();

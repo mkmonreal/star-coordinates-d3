@@ -3,6 +3,7 @@ import useConfigStore from '../stores/config-store';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import { useEffect, useState } from 'react';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
+import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 const dimensionalityReductionOptions = Object.values(
 	dimensionalityReductionStatisticalTechniquesEnum
@@ -24,7 +25,13 @@ const AnalysisConfiguration = () => {
 		(state) => state.setNormalizationMethod
 	);
 
-	const columns = useConfigStore((state) => state.columns);
+	const columns = useStarCoordinatesStore((state) => state.columns);
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
+	const setSelectedClassColumn = useStarCoordinatesStore(
+		(state) => state.setSelectedClassColumn
+	);
 
 	const [normalization, setNormalization] = useState(
 		normalizationMethodOptions[0].value
@@ -69,7 +76,11 @@ const AnalysisConfiguration = () => {
 					dimensionalityReduction ? (
 						<Flex gap="small" align="center">
 							<h3>Class:</h3>
-							<Select style={{ width: '100%' }} title="Class:">
+							<Select
+								style={{ width: '100%' }}
+								title="Class:"
+								onChange={setSelectedClassColumn}
+							>
 								{columns?.map((column) => (
 									<Select.Option key={column} value={column}>
 										{column}

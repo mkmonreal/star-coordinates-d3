@@ -5,6 +5,8 @@ const useStarCoordinatesStore = create((set, get) => ({
 	validColumns: [],
 	selectedColumns: [],
 	originalData: [],
+	selectedClassColumn: null,
+	classes: new Set(),
 	setColumns: (columns) => set({ columns }),
 	setValidColumns: (validColumns) => set({ validColumns }),
 	setSelectedColumns: (selectedColumns) => set({ selectedColumns }),
@@ -17,6 +19,8 @@ const useStarCoordinatesStore = create((set, get) => ({
 			),
 		}),
 	setOriginalData: (originalData) => set({ originalData }),
+	setSelectedClassColumn: (selectedClassColumn) => set({ selectedClassColumn }),
+	setClasses: (classes) => set({ classes }),
 }));
 
 export default useStarCoordinatesStore;
