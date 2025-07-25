@@ -62,6 +62,7 @@ function StarCoordinates({ height, width }) {
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
 	);
+	const setClasses = useStarCoordinatesStore((state) => state.setClasses);
 
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const fill = useConfigStore((state) => state.fill);
@@ -105,6 +106,7 @@ function StarCoordinates({ height, width }) {
 
 	useClassesMatrixexCreator(
 		setClassesMatrixesMap,
+		setClasses,
 		analysis,
 		selectedClassColumn,
 		selectedColumns,
