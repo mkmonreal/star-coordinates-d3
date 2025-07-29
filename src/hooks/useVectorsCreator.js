@@ -36,7 +36,12 @@ const useVectorsCreator = (
 		} else if (
 			DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
 		) {
-			createVectorsLDA(dataMatrix, classesDataMatrixes);
+			newVectors = createVectorsLDA(
+				dataMatrix,
+				classesDataMatrixes,
+				columns,
+				columnsDict
+			);
 		}
 
 		setVectors(newVectors);
@@ -69,9 +74,32 @@ function createVectorsPCA(dataMatrix, columns, columnsDict) {
 	return newVectors;
 }
 
-function createVectorsLDA(dataMatrix, classesDataMatrixes) {
-	const principalComponents = lda(dataMatrix, classesDataMatrixes);
-	return null;
+function createVectorsLDA(
+	dataMatrix,
+	classesDataMatrixes,
+	columns,
+	columnsDict
+) {
+	if (!dataMatrix || !classesDataMatrixes) {
+		return;
+	}
+
+	const { linearDiscriminants } = lda(dataMatrix, classesDataMatrixes);
+	const [ld1, ld2] = linearDiscriminants;
+	const newVectorsMatrix = matrix(matrixFromColumns(ld1.vector, ld2.vector));
+	const newVectors = columns.map((column, _, columns) => {
+		const index = columnsDict[column];
+		const vectorMatrix = row(newVectorsMatrix, index);
+		const [x, y] = vectorMatrix.toArray()[0];
+		const newVector = buildCartesianVector(
+			x,
+			y,
+			column,
+			`${column}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.PCA}`
+		);
+		return newVector;
+	});
+	return newVectors;
 }
 
 export default useVectorsCreator;

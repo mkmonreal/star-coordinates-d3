@@ -45,8 +45,20 @@ const useClassesMatrixesCreator = (
 			);
 		}
 
+		const indexesMap = new Map();
+		for (const classValue of classes) {
+			const indexes = originalData
+				.map((data, index) => ({
+					index,
+					data,
+				}))
+				.filter((data) => classValue === data.data[selectedClassColumn])
+				.map((data) => data.index);
+			indexesMap.set(classValue, indexes);
+		}
+
 		setClasses(classes);
-		setClassesMatrixMap(classesMatrixesMap);
+		setClassesMatrixMap(indexesMap);
 	}, [
 		setClassesMatrixMap,
 		setClasses,

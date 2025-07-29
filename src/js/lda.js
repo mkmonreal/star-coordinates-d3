@@ -1,63 +1,123 @@
-import { mean } from 'd3';
 import {
 	matrix,
+	matrixFromColumns,
 	subtract,
 	transpose,
 	multiply,
-	prod,
-	cross,
 	add,
-	isMatrix,
+	eigs,
+	inv,
+	mean,
 } from 'mathjs';
 import standarizeData from './data/standarize';
+import { initializeMatrixArrayWithValues } from '../utils/array';
 
-export const lda = (dataMatrix, classesMatrixesMap) => {
-	if (!dataMatrix || !classesMatrixesMap) {
+export const lda = (dataMatrix, classesIndexesMap) => {
+	if (!dataMatrix || !classesIndexesMap) {
 		return;
 	}
 
 	const standarizedData = standarizeData(dataMatrix);
-	const generalMeans = matrix([
-		standarizedData
-			.columns()
-			.map((column) => column.toArray().map((x) => x[0]))
-			.map((column) => mean(column)),
-	]);
-	const classes = Array.from(classesMatrixesMap.keys());
+	const generalMeans = matrix(
+		matrixFromColumns(
+			standarizedData
+				.columns()
+				.map((column) => column.toArray().map((x) => x[0]))
+				.map((column) => mean(column))
+		)
+	);
+	const classes = new Set(classesIndexesMap.keys());
 	const standarizedClassMatrixes = new Map();
 	const classMeans = new Map();
 	for (const classValue of classes) {
-		const classMatrix = classesMatrixesMap.get(classValue);
-		const standarizedClassMatrix = standarizeData(classMatrix);
-		const classMean = matrix([
-			standarizedClassMatrix
-				.columns()
-				.map((column) => column.toArray().map((x) => x[0]))
-				.map((column) => mean(column)),
-		]);
+		const classIndexes = classesIndexesMap.get(classValue);
+		// the classes matrix cannot be standarized independently beacase that
+		// standarization is not real, the general data should be use for
+		// standarization and separate the data in classes after that
+		const standarizedClassMatrix = matrix(
+			standarizedData
+				.toArray()
+				.filter((_, index) => classIndexes.includes(index))
+		);
+		// const standarizedClassMatrix = standarizedData.row(classindexes);
+		const classMean = matrix(
+			matrixFromColumns(
+				standarizedClassMatrix
+					.columns()
+					.map((column) => column.toArray().map((x) => x[0]))
+					.map((column) => mean(column))
+			)
+		);
 		standarizedClassMatrixes.set(classValue, standarizedClassMatrix);
 		classMeans.set(classValue, classMean);
 	}
 
-	// Calculo de la matriz de dispersion intra-clases
-	//const intraClassScatter;
+	let intraClassScatter = matrix(
+		initializeMatrixArrayWithValues(
+			generalMeans.size()[0],
+			generalMeans.size()[0]
+		)
+	);
 
-	// Calculo de la matriz de dispersion entre-clases
 	let interClassScatter = matrix(
-		Array.from({ length: generalMeans.size() }, () =>
-			Array(generalMeans.size()).fill(0)
+		initializeMatrixArrayWithValues(
+			generalMeans.size()[0],
+			generalMeans.size()[0]
 		)
 	);
 
 	for (const classValue of classes) {
-		const classMean = matrix(classMeans.get(classValue).toArray());
-		console.log(isMatrix(classMean));
-		console.log(isMatrix(generalMeans));
+		const classMean = classMeans.get(classValue);
+
+		// Calculo de la matriz de dispersion intra-clases
+		intraClassScatter = calculateIntraClassScatter(
+			standarizedClassMatrixes,
+			classValue,
+			classMean,
+			intraClassScatter
+		);
+
+		// Calculo de la matriz de dispersion entre-clases
 		const difference = subtract(classMean, generalMeans);
 		const differenceT = transpose(difference);
-		const scatterMatrix = multiply(differenceT, difference);
+		const scatterMatrix = multiply(
+			classesIndexesMap.get(classValue).length,
+			multiply(difference, differenceT)
+		);
 		interClassScatter = add(scatterMatrix, interClassScatter);
 	}
 
-	return interClassScatter;
+	const eigen = eigs(multiply(inv(intraClassScatter), interClassScatter));
+
+	return {
+		linearDiscriminants: eigen.eigenvectors
+			.sort((a, b) => subtract(b.value, a.value))
+			.map(createLinearDiscriminant),
+	};
 };
+
+function calculateIntraClassScatter(
+	standarizedClassMatrixes,
+	classValue,
+	classMean,
+	intraClassScatter
+) {
+	const standarizedClassMatrix = standarizedClassMatrixes
+		.get(classValue)
+		.toArray();
+
+	for (let valueRow of standarizedClassMatrix) {
+		const value = matrix(matrixFromColumns(valueRow));
+		const difference = subtract(value, classMean);
+		const differenceT = transpose(difference);
+		const scatterMatrix = multiply(difference, differenceT);
+		intraClassScatter = add(scatterMatrix, intraClassScatter);
+	}
+
+	return intraClassScatter;
+}
+
+function createLinearDiscriminant(eigen, index) {
+	eigen.name = `LD${index + 1}`;
+	return eigen;
+}
