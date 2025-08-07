@@ -13,7 +13,7 @@ function DataCircle({
 	if (!columnsDict) {
 		return null;
 	}
-	const columns = Object.keys(columnsDict);
+	const columns = columnsDict.keys().toArray();
 	if (!columns || columns.length === 0) {
 		return null;
 	}
@@ -29,11 +29,11 @@ function DataCircle({
 
 	for (const vector of vectors) {
 		cx +=
-			matrixRow[columnsDict[vector.label]] *
+			matrixRow[columnsDict.get(vector.label)] *
 			vector.cartesian.x *
 			unitCircleRadius;
 		cy +=
-			matrixRow[columnsDict[vector.label]] *
+			matrixRow[columnsDict.get(vector.label)] *
 			vector.cartesian.y *
 			unitCircleRadius;
 	}

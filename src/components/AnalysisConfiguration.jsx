@@ -4,6 +4,7 @@ import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimension
 import { useEffect, useState } from 'react';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 
 const dimensionalityReductionOptions = Object.values(
 	dimensionalityReductionStatisticalTechniquesEnum
@@ -20,6 +21,7 @@ const normalizationMethodOptions = Object.values(NormalizationMethodEnum).map(
 );
 
 const AnalysisConfiguration = () => {
+	const analysis = useConfigStore((state) => state.analysis);
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 	const setNormalizationMethod = useConfigStore(
 		(state) => state.setNormalizationMethod
@@ -44,6 +46,9 @@ const AnalysisConfiguration = () => {
 		setNormalizationMethod(normalization);
 	}, [normalization, setNormalizationMethod]);
 
+	useEffect(() => {
+		setDimensionalityReduction(analysis);
+	}, [analysis]);
 	useEffect(() => {
 		setAnalysis(dimensionalityReduction);
 	}, [dimensionalityReduction, setAnalysis]);

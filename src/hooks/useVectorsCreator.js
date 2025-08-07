@@ -67,7 +67,7 @@ function createVectorsPCA(dataMatrix, columns, columnsDict) {
 			x,
 			y,
 			column,
-			`${column}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.PCA}`
+			`${column}_${columns.length}`
 		);
 		return newVector;
 	});

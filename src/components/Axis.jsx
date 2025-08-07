@@ -1,5 +1,5 @@
 import { line } from 'd3';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import useDrag from '../hooks/useDrag';
 import { buildCartesianVector } from '../utils/vector';
@@ -24,15 +24,18 @@ const getPath = ({ x, y }) => [
 function Axis({ vector, unitCircleRadius, updateVector }) {
 	const arrowHeadScale = unitCircleRadius / 250;
 
-	const [vec, setVec] = useState(vector);
+	const [vectorState, setVectorState] = useState(vector);
+	useEffect(() => {
+		setVectorState(vector);
+	}, [vector]);
 
 	const arrowheadRef = useRef();
 
-	const x = unitCircleRadius * vec.cartesian.x;
-	const y = unitCircleRadius * -vec.cartesian.y;
+	const x = unitCircleRadius * vectorState.cartesian.x;
+	const y = unitCircleRadius * -vectorState.cartesian.y;
 
 	useDrag(arrowheadRef, (e) => {
-		setVec((prevVec) => {
+		setVectorState((prevVec) => {
 			const x = prevVec.cartesian.x + e.dx / unitCircleRadius;
 			const y = prevVec.cartesian.y - e.dy / unitCircleRadius;
 			const newVec = buildCartesianVector(x, y, prevVec.label, prevVec.id);
@@ -44,13 +47,13 @@ function Axis({ vector, unitCircleRadius, updateVector }) {
 	return (
 		<g>
 			<path d={lineGenerator(getPath({ x, y }))} stroke="gray" />
-			<Tooltip title={vec.label}>
+			<Tooltip title={vectorState.label}>
 				<path
 					ref={arrowheadRef}
 					d={lineGenerator(getArrowheadPath({ x, y }, arrowHeadScale))}
 					stroke="gray"
 					fill="gray"
-					transform={`rotate(${mod(360 - vec.polar.angle, 360)} ${x} ${y})`}
+					transform={`rotate(${mod(360 - vectorState.polar.angle, 360)} ${x} ${y})`}
 				/>
 			</Tooltip>
 		</g>

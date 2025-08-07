@@ -18,7 +18,7 @@ function ColumnsConfiguration({ idColumn }) {
 	const selectedColumns = useStarCoordinatesStore(
 		(state) => state.selectedColumns
 	);
-	const addSelectedHeader = useStarCoordinatesStore(
+	const addSelectedColumn = useStarCoordinatesStore(
 		(state) => state.addSelectedColumn
 	);
 	const removeSelectedColumn = useStarCoordinatesStore(
@@ -27,7 +27,7 @@ function ColumnsConfiguration({ idColumn }) {
 
 	const [showNotSelectedColumns, setShowNotSelectedColumns] = useState(false);
 
-	const notSelectedHeaders = validColumns.filter(
+	const notSelectedColumns = validColumns.filter(
 		(column) => !selectedColumns.includes(column)
 	);
 
@@ -58,14 +58,14 @@ function ColumnsConfiguration({ idColumn }) {
 						<Checkbox
 							key={column}
 							onChange={(e) =>
-								onChange(addSelectedHeader, removeSelectedColumn, e, column)
+								onChange(addSelectedColumn, removeSelectedColumn, e, column)
 							}
 							checked={true}
 						>
 							{column}
 						</Checkbox>
 					))}
-				{notSelectedHeaders && notSelectedHeaders.length > 0 && (
+				{notSelectedColumns && notSelectedColumns.length > 0 && (
 					<Button
 						type="link"
 						onClick={() => setShowNotSelectedColumns(!showNotSelectedColumns)}
@@ -75,7 +75,7 @@ function ColumnsConfiguration({ idColumn }) {
 				)}
 
 				{showNotSelectedColumns &&
-					notSelectedHeaders
+					notSelectedColumns
 						.sort((columnA, columnB) => {
 							return columnA.localeCompare(columnB);
 						})
@@ -83,7 +83,7 @@ function ColumnsConfiguration({ idColumn }) {
 							<Checkbox
 								key={column}
 								onChange={(e) =>
-									onChange(addSelectedHeader, removeSelectedColumn, e, column)
+									onChange(addSelectedColumn, removeSelectedColumn, e, column)
 								}
 							>
 								{column}

@@ -31,15 +31,11 @@ export const lda = (dataMatrix, classesIndexesMap) => {
 	const classMeans = new Map();
 	for (const classValue of classes) {
 		const classIndexes = classesIndexesMap.get(classValue);
-		// the classes matrix cannot be standarized independently beacase that
-		// standarization is not real, the general data should be use for
-		// standarization and separate the data in classes after that
 		const standarizedClassMatrix = matrix(
 			standarizedData
 				.toArray()
 				.filter((_, index) => classIndexes.includes(index))
 		);
-		// const standarizedClassMatrix = standarizedData.row(classindexes);
 		const classMean = matrix(
 			matrixFromColumns(
 				standarizedClassMatrix
