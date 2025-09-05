@@ -13,6 +13,7 @@ const useConfigStore = create((set) => ({
 	stroke: volcano.primary,
 	normalizationMethod: NormalizationMethodEnum.MIN_MAX,
 	analysis: dimensionalityReductionStatisticalTechniquesEnum.NONE,
+	numArrows: 3,
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
 	setSelectedVectors: (selectedVectors) => set({ selectedVectors }),
@@ -22,6 +23,7 @@ const useConfigStore = create((set) => ({
 	setStroke: (stroke) => set({ stroke }),
 	setNormalizationMethod: (normalizationMethod) => set({ normalizationMethod }),
 	setAnalysis: (analysis) => set({ analysis }),
+	setNumArrows: (numArrows) => set({ numArrows }),
 }));
 
 export default useConfigStore;

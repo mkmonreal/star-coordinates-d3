@@ -9,11 +9,13 @@ import Axis from './Axis';
 import Circle from './Circle';
 import DataCircle from './DataCircle';
 import useConfigStore from '../stores/config-store';
-import { buildCartesianVector, buildPolarVector } from '../utils/vector';
 import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import useNormalizedMatrix from '../hooks/useNormalizedMatrix';
-import useMatrix from '../hooks/useMatrix';
+import useDataMatrix from '../hooks/useDataMatrix';
 import { pca } from '../js/pca';
+import { matrix, matrixFromColumns, multiply } from 'mathjs';
+import useTransformedColumnsNames from '../hooks/useTransformedColumnsNames';
+import useVectors from '../hooks/useVectors';
 
 function StarCoordinates({ height, width }) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
@@ -44,19 +46,8 @@ function StarCoordinates({ height, width }) {
 		(state) => state.selectedColumns
 	);
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
-	const [vectors, setVectors] = useState();
-	useCreateVectorsFromSelectedColumns(setVectors, selectedColumns);
 
-	const columnsDict = useMemo(() => {
-		const columnsDict = selectedColumns.reduce((map, column, index) => {
-			map.set(column, index);
-			return map;
-		}, new Map());
-		return columnsDict;
-	}, [selectedColumns]);
-
-	const matrixData = useMatrix(originalData, selectedColumns);
-	const normalizedMatrix = useNormalizedMatrix(matrixData, normalizationMethod);
+	const numArrows = useConfigStore((state) => state.numArrows);
 
 	const svgRef = useRef();
 	useDrag(svgRef, (event) => {
@@ -65,31 +56,18 @@ function StarCoordinates({ height, width }) {
 	});
 
 	const analysis = useConfigStore((state) => state.analysis);
-	const setAnalysis = useConfigStore((state) => state.setAnalysis);
-	useEffect(() => {
-		if (DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis) {
-			const { principalComponents } = pca(matrixData);
-			const [pc1, pc2] = principalComponents.map((pc) => pc.vector.toArray());
 
-			const newVectors = selectedColumns.map((column, _, columns) => {
-				const index = columnsDict.get(column);
-				const x = pc1[index];
-				const y = pc2[index];
-				const newVector = buildCartesianVector(
-					x,
-					y,
-					column,
-					`${column}_${columns.length}`
-				);
-				return newVector;
-			});
-			setVectors(newVectors);
-		} else if (
-			DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
-		) {
-			console.log('LDA');
-		}
-	}, [analysis, setAnalysis, matrixData, selectedColumns, columnsDict]);
+	const { dataMatrix, columnsDictionary } = useDataMatrix(
+		originalData,
+		selectedColumns,
+		normalizationMethod,
+		analysis,
+		numArrows
+	);
+
+	// const [vectors, setVectors] = useVectors(columnsDictionary);
+	const [vectors, setVectors] = useState();
+	useVectors(setVectors, columnsDictionary);
 
 	return (
 		<svg
@@ -105,30 +83,22 @@ function StarCoordinates({ height, width }) {
 				stroke="grey"
 				fill="none"
 			/>
-			<g>
-				{vectors?.map((vector) => (
+			{vectors?.map((vector) => (
+				<g>
 					<Axis
 						key={`${analysis}_${vector.id}`}
 						vector={vector}
 						unitCircleRadius={unitCircleRadius}
 						updateVector={(newVector) => {
-							if (
-								DimensionalityReductionStatisticalTechniquesEnum.NONE !==
-								analysis
-							) {
-								setAnalysis(
-									DimensionalityReductionStatisticalTechniquesEnum.NONE
-								);
-							}
 							setVectors((prev) =>
 								prev.map((vec) => (vec.id === newVector.id ? newVector : vec))
 							);
 						}}
 					/>
-				))}
-			</g>
-			<g>
-				{normalizedMatrix?.toArray().map((value, index) => (
+				</g>
+			))}
+			{dataMatrix?.toArray().map((value, index) => (
+				<g>
 					<DataCircle
 						key={index}
 						matrixRow={value}
@@ -137,10 +107,10 @@ function StarCoordinates({ height, width }) {
 						fill={fill}
 						unitCircleRadius={unitCircleRadius}
 						vectors={vectors}
-						columnsDict={columnsDict}
+						columnsDict={columnsDictionary}
 					/>
-				))}
-			</g>
+				</g>
+			))}
 		</svg>
 	);
 }
@@ -149,34 +119,5 @@ StarCoordinates.propTypes = {
 	height: PropTypes.number.isRequired,
 	width: PropTypes.number.isRequired,
 };
-
-function useCreateVectorsFromSelectedColumns(setVectors, selectedColumns) {
-	useEffect(() => {
-		setVectors(createVectors(selectedColumns));
-	}, [setVectors, selectedColumns]);
-}
-
-function createVectors(columns) {
-	if (!columns || columns.length === 0) {
-		return;
-	}
-
-	const vectors = [];
-	const angleDiff = 360 / columns.length;
-
-	for (const [index, validHeader] of columns.entries()) {
-		const module = 1;
-		const angle = index * angleDiff;
-		const vector = buildPolarVector(
-			module,
-			angle,
-			validHeader,
-			`${validHeader}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.NONE}`
-		);
-		vectors.push(vector);
-	}
-
-	return vectors;
-}
 
 export default StarCoordinates;
