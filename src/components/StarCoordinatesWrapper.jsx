@@ -61,7 +61,18 @@ function StarCoordinatesWrapper({ height, width }) {
 	const [vectors, setVectors] = useState([]);
 	useVectors(setVectors, columnsDictionary);
 
-	return <StarCoordinates width={width} height={height} vectors={vectors} />;
+	const handleVectorUpdate = (newVectors) => {
+		setVectors(newVectors);
+	};
+
+	return (
+		<StarCoordinates
+			width={width}
+			height={height}
+			vectors={vectors}
+			onVectorUpdate={handleVectorUpdate}
+		/>
+	);
 }
 
 StarCoordinatesWrapper.propTypes = {
