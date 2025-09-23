@@ -4,7 +4,6 @@ import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimension
 import { useEffect, useState } from 'react';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 
 const dimensionalityReductionOptions = Object.values(
 	dimensionalityReductionStatisticalTechniquesEnum
@@ -28,9 +27,6 @@ const AnalysisConfiguration = () => {
 	);
 
 	const columns = useStarCoordinatesStore((state) => state.columns);
-	const selectedClassColumn = useStarCoordinatesStore(
-		(state) => state.selectedClassColumn
-	);
 	const setSelectedClassColumn = useStarCoordinatesStore(
 		(state) => state.setSelectedClassColumn
 	);

@@ -1,14 +1,23 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import useConfigStore from '../stores/config-store';
-import { mod } from 'mathjs';
+import { mod, matrix, multiply } from 'mathjs';
 import { buildCartesianVector } from '../utils/vector';
 
 const lineGenerator = d3.line();
 
-function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
+function StarCoordinates({
+	width,
+	height,
+	vectors,
+	onVectorUpdate,
+	dataMatrix,
+}) {
 	const svgRef = useRef();
+	const currentViewBox = useRef({ x: -width / 2, y: -height / 2 });
 	const currentVectors = useRef(vectors);
+	const currentDataMatrix = useRef(dataMatrix);
+	const currentPoints = useRef([]);
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const arrowHeadScale = unitCircleRadius / 250;
 
@@ -17,8 +26,22 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 	}, [vectors]);
 
 	useEffect(() => {
-		let x = -width / 2;
-		let y = -height / 2;
+		currentDataMatrix.current = dataMatrix;
+	});
+
+	useEffect(() => {
+		currentViewBox.current = { x: -width / 2, y: -height / 2 };
+	}, [width, height]);
+
+	useEffect(() => {
+		const calculatedPoints = calculatePoints(
+			currentVectors.current,
+			currentDataMatrix.current
+		);
+		currentPoints.current = calculatedPoints;
+	}, [vectors, dataMatrix]);
+
+	useEffect(() => {
 		const svg = d3.select(svgRef.current);
 
 		svg.selectAll('*').remove();
@@ -26,7 +49,10 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 		svg
 			.attr('width', width)
 			.attr('height', height)
-			.attr('viewBox', `${x} ${y} ${width} ${height}`);
+			.attr(
+				'viewBox',
+				`${currentViewBox.current.x} ${currentViewBox.current.y} ${width} ${height}`
+			);
 
 		svg
 			.append('circle')
@@ -41,9 +67,13 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 
 		svg.call(
 			d3.drag().on('drag', (e) => {
-				x = x - e.dx;
-				y = y - e.dy;
-				svg.attr('viewBox', `${x} ${y} ${width} ${height}`);
+				const x = currentViewBox.current.x - e.dx;
+				const y = currentViewBox.current.y - e.dy;
+				currentViewBox.current = { x, y };
+				svg.attr(
+					'viewBox',
+					`${currentViewBox.current.x} ${currentViewBox.current.y} ${width} ${height}`
+				);
 			})
 		);
 	}, [width, height, unitCircleRadius]);
@@ -137,8 +167,7 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 														'transform',
 														`rotate(${getArrowheadRotation(newVector.cartesian.x, newVector.cartesian.y, newVector.polar.angle, unitCircleRadius)})`
 													);
-												const arrowGroup = d3.select(this.parentNode);
-												arrowGroup
+												d3.select(this.parentNode)
 													.select('.arrow-body')
 													.attr(
 														'd',
@@ -149,6 +178,21 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 																unitCircleRadius
 															)
 														)
+													);
+
+												const dataPoints = calculatePoints(
+													currentVectors.current,
+													currentDataMatrix.current
+												);
+
+												svg
+													.select('.data-circles')
+													.selectAll('.data-circle')
+													.data(dataPoints, (d) => d.id)
+													.join(
+														enterDataCircle,
+														updateDataCircle,
+														exitDataCircle
 													);
 											})
 											.on('end', () => {
@@ -186,7 +230,34 @@ function StarCoordinates({ width, height, vectors, onVectorUpdate }) {
 					}),
 				(exit) => exit.remove()
 			);
-	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate]);
+
+		svg
+			.select('.data-circles')
+			.selectAll('.data-circle')
+			.data(currentPoints.current, (d) => d.id)
+			.join(enterDataCircle, updateDataCircle, exitDataCircle);
+
+		function enterDataCircle(enter) {
+			enter
+				.append('circle')
+				.classed('data-circle', true)
+				.attr('cx', (d) => d.x * unitCircleRadius)
+				.attr('cy', (d) => -d.y * unitCircleRadius)
+				.attr('r', 3)
+				.attr('stroke', 'red')
+				.attr('fill', 'orange');
+		}
+
+		function updateDataCircle(update) {
+			update
+				.attr('cx', (d) => d.x * unitCircleRadius)
+				.attr('cy', (d) => -d.y * unitCircleRadius);
+		}
+
+		function exitDataCircle(exit) {
+			exit.remove();
+		}
+	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate, dataMatrix]);
 
 	return <svg ref={svgRef}></svg>;
 }
@@ -213,6 +284,27 @@ function getArrowbodyPath(x, y, unitCircleRadius = 1) {
 		[0, 0],
 		[x * unitCircleRadius, y * unitCircleRadius],
 	];
+}
+
+function calculatePoints(vectors, dataMatrix) {
+	if (!vectors) {
+		return [];
+	}
+
+	const vectorsMatrix = matrix(
+		vectors.map((vector) => [vector.cartesian.x, vector.cartesian.y])
+	);
+
+	if (dataMatrix.size()[1] !== vectorsMatrix.size()[0]) {
+		return [];
+	}
+
+	const dataPoints = multiply(dataMatrix, vectorsMatrix);
+	const calculatedPoints = dataPoints.toArray().map((d, i) => {
+		return { id: i, x: d[0], y: d[1] };
+	});
+
+	return calculatedPoints;
 }
 
 export default StarCoordinates;
