@@ -24,18 +24,12 @@ function StarCoordinates({
 	const arrowHeadScale = unitCircleRadius / 250;
 
 	useEffect(() => {
-		currentVectors.current = vectors;
-	}, [vectors]);
-
-	useEffect(() => {
-		currentDataMatrix.current = dataMatrix;
-	});
-
-	useEffect(() => {
 		currentViewBox.current = { x: -width / 2, y: -height / 2 };
 	}, [width, height]);
 
 	useEffect(() => {
+		currentVectors.current = vectors;
+		currentDataMatrix.current = dataMatrix;
 		const calculatedPoints = calculatePoints(
 			currentVectors.current,
 			currentDataMatrix.current
@@ -82,6 +76,12 @@ function StarCoordinates({
 
 	useEffect(() => {
 		if (!currentVectors.current) {
+			return;
+		}
+		if (!currentDataMatrix.current) {
+			return;
+		}
+		if (!currentPoints.current) {
 			return;
 		}
 
@@ -138,11 +138,13 @@ function StarCoordinates({
 									.drag()
 									.on('start', (e) => {
 										currentNode.current = e.sourceEvent.target;
+										svg.style('cursor', 'grabbing');
 										path.style('cursor', 'grabbing');
 									})
 									.on('drag', handleOnDragArrowhead)
 									.on('end', () => {
 										currentNode.current = null;
+										svg.style('cursor', 'move');
 										path.style('cursor', 'grab');
 										onVectorUpdate(currentVectors.current);
 									})
@@ -264,7 +266,7 @@ function StarCoordinates({
 		}
 	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate, dataMatrix]);
 
-	return <svg ref={svgRef}></svg>;
+	return <svg className="star-coordinates" ref={svgRef}></svg>;
 }
 
 function getArrowheadPath({ x, y }, ratio = 1) {

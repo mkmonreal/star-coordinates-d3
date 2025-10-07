@@ -25,6 +25,11 @@ function StarCoordinatesWrapper({ height, width }) {
 	const selectedColumns = useStarCoordinatesStore(
 		(state) => state.selectedColumns
 	);
+
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
+
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
 	const numArrows = useConfigStore((state) => state.numArrows);
@@ -36,23 +41,30 @@ function StarCoordinatesWrapper({ height, width }) {
 		selectedColumns,
 		normalizationMethod,
 		analysis,
-		numArrows
+		numArrows,
+		selectedClassColumn
 	);
 
-	const [vectors, setVectors] = useVectors(columnsDictionary);
+	const [vectors, setVectors] = useVectors(
+		columnsDictionary,
+		analysis,
+		numArrows
+	);
 
 	const handleVectorUpdate = (newVectors) => {
 		setVectors(newVectors);
 	};
 
 	return (
-		<StarCoordinates
-			width={width}
-			height={height}
-			vectors={vectors}
-			onVectorUpdate={handleVectorUpdate}
-			dataMatrix={dataMatrix}
-		/>
+		vectors && (
+			<StarCoordinates
+				width={width}
+				height={height}
+				vectors={vectors}
+				onVectorUpdate={handleVectorUpdate}
+				dataMatrix={dataMatrix}
+			/>
+		)
 	);
 }
 

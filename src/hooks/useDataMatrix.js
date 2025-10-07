@@ -5,17 +5,20 @@ import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 import { pca } from '../js/pca';
+import { lda } from '../js/lda';
 
 function useDataMatrix(
 	originalData,
 	selectedColumns,
 	normalizationMethod,
 	analysis,
-	numArrows
+	numArrows,
+	selectedClassColumn
 ) {
 	const dataMatrix = useMemo(() => {
 		let dataMatrix = null;
 		let columnsDictionary = null;
+		let classesIndexesMap = null;
 
 		const originalMatrix = matrix(
 			matrixFromColumns(
@@ -31,11 +34,33 @@ function useDataMatrix(
 		dataMatrix = normalizedMatrix;
 
 		let eigenDecomposition = null;
+		if (selectedClassColumn) {
+			const distinctClasses = new Set(
+				originalData.map((d) => d[selectedClassColumn])
+			);
+
+			if (!distinctClasses) {
+				return;
+			}
+
+			classesIndexesMap = distinctClasses
+				.values()
+				.reduce((acc, uniqueClass) => {
+					acc.set(
+						uniqueClass,
+						originalData
+							.filter((d) => uniqueClass === d[selectedClassColumn])
+							.map((_, i) => i)
+					);
+					return acc;
+				}, new Map());
+		}
 
 		eigenDecomposition = createEigenDecomposition(
 			analysis,
 			originalMatrix,
-			eigenDecomposition
+			eigenDecomposition,
+			classesIndexesMap
 		);
 
 		if (!eigenDecomposition) {
@@ -48,8 +73,11 @@ function useDataMatrix(
 
 		if (DimensionalityReductionStatisticalTechniquesEnum.NONE === analysis) {
 			return;
-		} else if (
-			DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis
+		}
+
+		if (
+			DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis ||
+			DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
 		) {
 			if (!eigenDecomposition || 0 === eigenDecomposition.length) {
 				return;
@@ -78,7 +106,14 @@ function useDataMatrix(
 			}, new Map());
 		}
 		return { dataMatrix, columnsDictionary };
-	}, [originalData, selectedColumns, normalizationMethod, analysis, numArrows]);
+	}, [
+		originalData,
+		selectedColumns,
+		normalizationMethod,
+		analysis,
+		numArrows,
+		selectedClassColumn,
+	]);
 
 	return dataMatrix;
 }
@@ -97,7 +132,8 @@ function selectNormalizationMethod(method) {
 function createEigenDecomposition(
 	analysis,
 	originalMatrix,
-	eigenDecomposition
+	eigenDecomposition,
+	classesIndexesMap
 ) {
 	if (DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis) {
 		const { principalComponents } = pca(originalMatrix);
@@ -105,7 +141,11 @@ function createEigenDecomposition(
 	} else if (
 		DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
 	) {
-		console.log('LDA');
+		if (!classesIndexesMap) {
+			return eigenDecomposition;
+		}
+		const { linearDiscriminants } = lda(originalMatrix, classesIndexesMap);
+		eigenDecomposition = linearDiscriminants;
 	}
 	return eigenDecomposition;
 }

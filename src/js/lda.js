@@ -12,7 +12,7 @@ import {
 import standarizeData from './data/standarize';
 import { initializeMatrixArrayWithValues } from '../utils/array';
 
-export const lda = (dataMatrix, classesIndexesMap) => {
+export function lda(dataMatrix, classesIndexesMap) {
 	if (!dataMatrix || !classesIndexesMap) {
 		return;
 	}
@@ -90,7 +90,7 @@ export const lda = (dataMatrix, classesIndexesMap) => {
 			.sort((a, b) => subtract(b.value, a.value))
 			.map(createLinearDiscriminant),
 	};
-};
+}
 
 function calculateIntraClassScatter(
 	standarizedClassMatrixes,

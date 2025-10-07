@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react';
 import { buildPolarVector } from '../utils/vector';
+import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 
-function useVectors(columnsDictionary) {
+function useVectors(columnsDictionary, analysis, numArrows) {
 	const [vectors, setVectors] = useState();
 
 	useEffect(() => {
-		const columnsNames = Array.from(columnsDictionary.keys());
+		if (!columnsDictionary) {
+			return;
+		}
+
+		let columnsNames = Array.from(columnsDictionary.keys());
+		if (DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis) {
+			columnsNames = columnsNames.slice(0, numArrows);
+		}
+		if (DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis) {
+			columnsNames = columnsNames.slice(0, numArrows);
+		}
 		setVectors(createVectors(columnsNames));
-	}, [columnsDictionary]);
+	}, [columnsDictionary, analysis, numArrows]);
 
 	return [vectors, setVectors];
 }
