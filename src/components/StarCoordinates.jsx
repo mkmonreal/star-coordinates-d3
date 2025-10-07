@@ -1,166 +1,325 @@
-import PropTypes from 'prop-types';
-import { useRef, useState, useEffect } from 'react';
-
-import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-
-import useDrag from '../hooks/useDrag';
-
-import Axis from './Axis';
-import Circle from './Circle';
-import DataCircle from './DataCircle';
+import { useEffect, useRef } from 'react';
+import * as d3 from 'd3';
 import useConfigStore from '../stores/config-store';
-import { buildCartesianVector, buildPolarVector } from '../utils/vector';
-import { matrix, matrixFromColumns, row } from 'mathjs';
-import normalizeData from '../js/data/normalize';
-import standarizeData from '../js/data/standarize';
-import NormalizationMethodEnum from '../enums/normalization-method-enum';
-import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
-import { pca } from '../js/pca';
-import useColumnsDictCreator from '../hooks/useColumnsDictCreator';
-import useNormalicedMatrixCreator from '../hooks/useNormalicedMatrixCreator';
-import useDataMatrixCreator from '../hooks/useDataMatrixCreator';
-import useVectorsCreator from '../hooks/useVectorsCreator';
+import { mod, matrix, multiply } from 'mathjs';
+import { buildCartesianVector } from '../utils/vector';
+import PropTypes from 'prop-types';
 
-const createVectors = (columns) => {
-	if (!columns || columns.length === 0) {
-		return;
-	}
+const lineGenerator = d3.line();
 
-	const vectors = [];
-	const angleDiff = 360 / columns.length;
-
-	for (const [index, validHeader] of columns.entries()) {
-		const module = 1;
-		const angle = index * angleDiff;
-		const vector = buildPolarVector(
-			module,
-			angle,
-			validHeader,
-			`${validHeader}_${columns.length}_${DimensionalityReductionStatisticalTechniquesEnum.NONE}`
-		);
-		vectors.push(vector);
-	}
-
-	return vectors;
-};
-
-const normalizationMethodSelector = (method) => {
-	switch (method) {
-		case NormalizationMethodEnum.MIN_MAX:
-			return normalizeData;
-		case NormalizationMethodEnum.Z_SCORE:
-			return standarizeData;
-		default:
-			return normalizeData;
-	}
-};
-
-function StarCoordinates({ height, width }) {
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
-	const selectedColumns = useStarCoordinatesStore(
-		(state) => state.selectedColumns
-	);
-
-	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
-	const fill = useConfigStore((state) => state.fill);
-	const stroke = useConfigStore((state) => state.stroke);
-	const idColumn = useConfigStore((state) => state.idColumn);
-	const setUnitCircleRadius = useConfigStore(
-		(state) => state.setUnitCircleRadius
-	);
-	const normalizationMethod = useConfigStore(
-		(state) => state.normalizationMethod
-	);
-	const analysis = useConfigStore((state) => state.analysis);
-
-	if (height > width) {
-		setUnitCircleRadius(width / 5);
-	} else {
-		setUnitCircleRadius(height / 5);
-	}
-
-	const centerX = width / 2;
-	const centerY = height / 2;
-
-	const [minX, setMinX] = useState(-centerX);
-	const [minY, setMinY] = useState(-centerY);
-
-	const [vectors, setVectors] = useState();
-	const [dataMatrix, setDataMatrix] = useState();
-	const [normalizedMatrix, setNormalizedMatrix] = useState();
-	const [columnsDict, setColumnsDict] = useState();
-
-	useColumnsDictCreator(setColumnsDict, selectedColumns);
-
-	useDataMatrixCreator(setDataMatrix, selectedColumns, originalData);
-
-	useNormalicedMatrixCreator(
-		setNormalizedMatrix,
-		normalizationMethodSelector(normalizationMethod),
-		dataMatrix
-	);
-
-	useVectorsCreator(
-		createVectors,
-		setVectors,
-		analysis,
-		columnsDict,
-		dataMatrix
-	);
-
+function StarCoordinates({
+	width,
+	height,
+	vectors,
+	onVectorUpdate,
+	dataMatrix,
+}) {
 	const svgRef = useRef();
-	useDrag(svgRef, (event) => {
-		setMinX((prevMinX) => prevMinX - event.dx);
-		setMinY((prevMinY) => prevMinY - event.dy);
+	const currentViewBox = useRef({ x: -width / 2, y: -height / 2 });
+	const currentVectors = useRef(vectors);
+	const currentDataMatrix = useRef(dataMatrix);
+	const currentPoints = useRef([]);
+	const currentNode = useRef(null);
+	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
+	const arrowHeadScale = unitCircleRadius / 250;
+
+	useEffect(() => {
+		currentViewBox.current = { x: -width / 2, y: -height / 2 };
+	}, [width, height]);
+
+	useEffect(() => {
+		currentVectors.current = vectors;
+		currentDataMatrix.current = dataMatrix;
+		const calculatedPoints = calculatePoints(
+			currentVectors.current,
+			currentDataMatrix.current
+		);
+		currentPoints.current = calculatedPoints;
+	}, [vectors, dataMatrix]);
+
+	useEffect(() => {
+		const svg = d3.select(svgRef.current);
+
+		svg.selectAll('*').remove();
+
+		svg
+			.attr('width', width)
+			.attr('height', height)
+			.attr(
+				'viewBox',
+				`${currentViewBox.current.x} ${currentViewBox.current.y} ${width} ${height}`
+			);
+
+		svg
+			.append('circle')
+			.attr('cx', 0)
+			.attr('cy', 0)
+			.attr('r', unitCircleRadius)
+			.attr('stroke', 'grey')
+			.attr('fill', 'none');
+
+		svg.append('g').classed('arrows', true);
+		svg.append('g').classed('data-circles', true);
+
+		svg.call(
+			d3.drag().on('drag', (e) => {
+				const x = currentViewBox.current.x - e.dx;
+				const y = currentViewBox.current.y - e.dy;
+				currentViewBox.current = { x, y };
+				svg.attr(
+					'viewBox',
+					`${currentViewBox.current.x} ${currentViewBox.current.y} ${width} ${height}`
+				);
+			})
+		);
+	}, [width, height, unitCircleRadius]);
+
+	useEffect(() => {
+		if (!currentVectors.current) {
+			return;
+		}
+		if (!currentDataMatrix.current) {
+			return;
+		}
+		if (!currentPoints.current) {
+			return;
+		}
+
+		const svg = d3.select(svgRef.current);
+
+		svg
+			.select('.arrows')
+			.selectAll('.arrow')
+			.data(currentVectors.current, (vector) => vector.label)
+			.join(enterArrows, updateArrows, exitArrows);
+
+		svg
+			.select('.data-circles')
+			.selectAll('.data-circle')
+			.data(currentPoints.current, (d) => d.id)
+			.join(enterDataCircle, updateDataCircle, exitDataCircle);
+
+		function enterArrows(enter) {
+			enter
+				.append('g')
+				.classed('arrow', true)
+				.call((g) => {
+					g.append('path')
+						.classed('arrow-body', true)
+						.attr('d', (d) =>
+							lineGenerator(
+								getArrowbodyPath(d.cartesian.x, d.cartesian.y, unitCircleRadius)
+							)
+						)
+						.attr('stroke', 'gray');
+					g.append('path')
+						.classed('arrow-head', true)
+						.attr('d', (d) =>
+							lineGenerator(
+								getArrowheadPath(
+									{
+										x: d.cartesian.x * unitCircleRadius,
+										y: d.cartesian.y * unitCircleRadius,
+									},
+									arrowHeadScale
+								)
+							)
+						)
+						.attr('stroke', 'gray')
+						.attr('fill', 'gray')
+						.attr(
+							'transform',
+							(d) =>
+								`rotate(${calculateArrowheadRotation(d.cartesian.x, d.cartesian.y, d.polar.angle, unitCircleRadius)})`
+						)
+						.call((path) => {
+							path.call(
+								d3
+									.drag()
+									.on('start', (e) => {
+										currentNode.current = e.sourceEvent.target;
+										svg.style('cursor', 'grabbing');
+										path.style('cursor', 'grabbing');
+									})
+									.on('drag', handleOnDragArrowhead)
+									.on('end', () => {
+										currentNode.current = null;
+										svg.style('cursor', 'move');
+										path.style('cursor', 'grab');
+										onVectorUpdate(currentVectors.current);
+									})
+							);
+						});
+				});
+		}
+
+		function updateArrows(update) {
+			update.call((g) => {
+				g.select('.arrow-body').attr('d', (d) =>
+					lineGenerator(
+						getArrowbodyPath(d.cartesian.x, d.cartesian.y, unitCircleRadius)
+					)
+				);
+				g.select('.arrow-head')
+					.attr('d', (d) =>
+						lineGenerator(
+							getArrowheadPath(
+								{
+									x: d.cartesian.x * unitCircleRadius,
+									y: d.cartesian.y * unitCircleRadius,
+								},
+								arrowHeadScale
+							)
+						)
+					)
+					.attr(
+						'transform',
+						(d) =>
+							`rotate(${calculateArrowheadRotation(d.cartesian.x, d.cartesian.y, d.polar.angle, unitCircleRadius)})`
+					);
+			});
+		}
+
+		function exitArrows(exit) {
+			exit.remove();
+		}
+
+		function enterDataCircle(enter) {
+			enter
+				.append('circle')
+				.classed('data-circle', true)
+				.attr('cx', (d) => d.x * unitCircleRadius)
+				.attr('cy', (d) => -d.y * unitCircleRadius)
+				.attr('r', 3)
+				.attr('stroke', 'red')
+				.attr('fill', 'orange');
+		}
+
+		function updateDataCircle(update) {
+			update
+				.attr('cx', (d) => d.x * unitCircleRadius)
+				.attr('cy', (d) => -d.y * unitCircleRadius);
+		}
+
+		function exitDataCircle(exit) {
+			exit.remove();
+		}
+
+		function handleOnDragArrowhead(e, d) {
+			const currentVector = currentVectors.current.find(
+				(vector) => d.label === vector.label
+			);
+
+			const newVector = buildCartesianVector(
+				currentVector.cartesian.x + e.dx / unitCircleRadius,
+				currentVector.cartesian.y - e.dy / unitCircleRadius,
+				currentVector.label
+			);
+			currentVectors.current = currentVectors.current.map((vector) =>
+				newVector.label === vector.label ? newVector : vector
+			);
+
+			updateArrowPosition(
+				d3.select(currentNode.current),
+				newVector.cartesian.x,
+				newVector.cartesian.y,
+				newVector.polar.angle
+			);
+
+			const dataPoints = calculatePoints(
+				currentVectors.current,
+				currentDataMatrix.current
+			);
+
+			svg
+				.select('.data-circles')
+				.selectAll('.data-circle')
+				.data(dataPoints, (d) => d.id)
+				.join(enterDataCircle, updateDataCircle, exitDataCircle);
+		}
+
+		function updateArrowPosition(selection, x, y, angle) {
+			if (!selection.node()) {
+				return;
+			}
+
+			selection
+				.attr(
+					'd',
+					lineGenerator(
+						getArrowheadPath(
+							{
+								x: x * unitCircleRadius,
+								y: y * unitCircleRadius,
+							},
+							arrowHeadScale
+						)
+					)
+				)
+				.attr(
+					'transform',
+					`rotate(${calculateArrowheadRotation(x, y, angle, unitCircleRadius)})`
+				);
+			d3.select(selection.node().parentNode)
+				.select('.arrow-body')
+				.attr('d', lineGenerator(getArrowbodyPath(x, y, unitCircleRadius)));
+		}
+	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate, dataMatrix]);
+
+	return <svg className="star-coordinates" ref={svgRef}></svg>;
+}
+
+function getArrowheadPath({ x, y }, ratio = 1) {
+	y = -y;
+	return [
+		[x - 15 * ratio, y],
+		[x - 18 * ratio, y + 6 * ratio],
+		[x, y],
+		[x - 18 * ratio, y - 6 * ratio],
+		[x - 15 * ratio, y],
+	];
+}
+
+function calculateArrowheadRotation(x, y, angle, unitCircleRadius = 1) {
+	y = -y;
+	return `${mod(360 - angle, 360)} ${x * unitCircleRadius}, ${y * unitCircleRadius}`;
+}
+
+function getArrowbodyPath(x, y, unitCircleRadius = 1) {
+	y = -y;
+	return [
+		[0, 0],
+		[x * unitCircleRadius, y * unitCircleRadius],
+	];
+}
+
+function calculatePoints(vectors, dataMatrix) {
+	if (!vectors) {
+		return [];
+	}
+
+	const vectorsMatrix = matrix(
+		vectors.map((vector) => [vector.cartesian.x, vector.cartesian.y])
+	);
+
+	if (dataMatrix.size()[1] !== vectorsMatrix.size()[0]) {
+		return [];
+	}
+
+	const dataPoints = multiply(dataMatrix, vectorsMatrix);
+	const calculatedPoints = dataPoints.toArray().map((d, i) => {
+		return { id: i, x: d[0], y: d[1] };
 	});
 
-	return (
-		<svg
-			ref={svgRef}
-			height={height}
-			width={width}
-			viewBox={`${minX} ${minY} ${width} ${height}`}
-		>
-			<Circle
-				cx={0}
-				cy={0}
-				radius={unitCircleRadius}
-				stroke="grey"
-				fill="none"
-			/>
-			{vectors &&
-				vectors.map((vector) => (
-					<Axis
-						key={vector.id}
-						vector={vector}
-						unitCircleRadius={unitCircleRadius}
-						updateVector={(newVector) =>
-							setVectors((prev) =>
-								prev.map((vec) => (vec.id === newVector.id ? newVector : vec))
-							)
-						}
-					/>
-				))}
-
-			<g>
-				{normalizedMatrix &&
-					normalizedMatrix
-						.toArray()
-						.map((value, index) => (
-							<DataCircle
-								key={index}
-								matrixRow={value}
-								radius={(3 * unitCircleRadius) / 250}
-								stroke={stroke}
-								fill={fill}
-								unitCircleRadius={unitCircleRadius}
-								vectors={vectors}
-								columnsDict={columnsDict}
-							/>
-						))}
-			</g>
-		</svg>
-	);
+	return calculatedPoints;
 }
+
+StarCoordinates.propTypes = {
+	height: PropTypes.number.isRequired,
+	width: PropTypes.number.isRequired,
+	vectors: PropTypes.array.isRequired,
+	onVectorUpdate: PropTypes.func.isRequired,
+	dataMatrix: PropTypes.object.isRequired,
+};
 
 export default StarCoordinates;

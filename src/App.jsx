@@ -8,6 +8,7 @@ import useStarCoordinatesStore from './stores/star-coorditantes-store';
 import parseCsv from './js/csv-parser';
 import useConfigStore from './stores/config-store';
 import Configuration from './components/Configuration';
+import StarCoordinatesWrapper from './components/StarCoordinatesWrapper';
 
 const onFileReaderLoad = (
 	event,
@@ -92,7 +93,7 @@ function App() {
 	return (
 		<>
 			{validColumns.length ? (
-				<StarCoordinates width={width} height={height} />
+				<StarCoordinatesWrapper width={width} height={height} />
 			) : (
 				<Empty />
 			)}

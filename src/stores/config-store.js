@@ -7,19 +7,23 @@ const useConfigStore = create((set) => ({
 	idColumn: '',
 	unitCircleRadius: 150,
 	selectedVectors: [],
+	className: null,
 	radius: 4,
 	fill: orange.primary,
 	stroke: volcano.primary,
 	normalizationMethod: NormalizationMethodEnum.MIN_MAX,
 	analysis: dimensionalityReductionStatisticalTechniquesEnum.NONE,
+	numArrows: 3,
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
 	setSelectedVectors: (selectedVectors) => set({ selectedVectors }),
+	setClassName: (className) => set({ className }),
 	setRadius: (radius) => set({ radius }),
 	setFill: (fill) => set({ fill }),
 	setStroke: (stroke) => set({ stroke }),
 	setNormalizationMethod: (normalizationMethod) => set({ normalizationMethod }),
 	setAnalysis: (analysis) => set({ analysis }),
+	setNumArrows: (numArrows) => set({ numArrows }),
 }));
 
 export default useConfigStore;

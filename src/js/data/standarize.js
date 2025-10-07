@@ -1,7 +1,9 @@
 import { column, std, mean, isDenseMatrix, divide, subtract } from 'mathjs';
 
 function standarize(value, meanValue, standardDeviationValue) {
-	return divide(subtract(value, meanValue), standardDeviationValue);
+	return 0 === standardDeviationValue
+		? 0
+		: divide(subtract(value, meanValue), standardDeviationValue);
 }
 
 const standarizeData = (data) => {
