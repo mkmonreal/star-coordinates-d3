@@ -2,6 +2,28 @@ import { describe, it, expect } from 'vitest';
 import { lda } from './lda';
 import { matrix } from 'mathjs';
 
+const create2ClassDataset = () => ({
+	dataMatrix: matrix([
+		[1, 2],
+		[1.2, 2.8],
+		[1.8, 2.2],
+		[4, 1],
+		[4.8, 1.2],
+		[4.2, 1.8],
+	]),
+	classesMatrixesMap: new Map([
+		['class1', [0, 1, 2]],
+		['class2', [3, 4, 5]],
+	]),
+});
+
+const assertValidLdaResult = (result) => {
+	expect(result).toBeDefined();
+	expect(result.linearDiscriminants).toBeDefined();
+	expect(Array.isArray(result.linearDiscriminants)).toBe(true);
+	expect(result.linearDiscriminants.length).toBeGreaterThan(0);
+};
+
 describe('lda', () => {
 	it('should return undefined for null or undefined inputs', () => {
 		expect(lda(null, null)).toBeUndefined();
@@ -11,43 +33,13 @@ describe('lda', () => {
 	});
 
 	it('should perform LDA on a simple 2D dataset with 2 classes', () => {
-		const dataMatrix = matrix([
-			[1.0, 2.0],
-			[1.2, 2.8],
-			[1.8, 2.2],
-			[4.0, 1.0],
-			[4.8, 1.2],
-			[4.2, 1.8],
-		]);
-
-		const classesMatrixesMap = new Map([
-			['class1', [0, 1, 2]],
-			['class2', [3, 4, 5]],
-		]);
-
+		const { dataMatrix, classesMatrixesMap } = create2ClassDataset();
 		const result = lda(dataMatrix, classesMatrixesMap);
-
-		expect(result).toBeDefined();
-		expect(result.linearDiscriminants).toBeDefined();
-		expect(Array.isArray(result.linearDiscriminants)).toBe(true);
-		expect(result.linearDiscriminants.length).toBeGreaterThan(0);
+		assertValidLdaResult(result);
 	});
 
 	it('should create linear discriminants with proper naming', () => {
-		const dataMatrix = matrix([
-			[1.0, 2.0],
-			[1.2, 2.8],
-			[1.8, 2.2],
-			[4.0, 1.0],
-			[4.8, 1.2],
-			[4.2, 1.8],
-		]);
-
-		const classesMatrixesMap = new Map([
-			['class1', [0, 1, 2]],
-			['class2', [3, 4, 5]],
-		]);
-
+		const { dataMatrix, classesMatrixesMap } = create2ClassDataset();
 		const result = lda(dataMatrix, classesMatrixesMap);
 
 		expect(result.linearDiscriminants[0]).toHaveProperty('name');
@@ -59,13 +51,13 @@ describe('lda', () => {
 
 	it('should handle 3D data with multiple classes', () => {
 		const dataMatrix = matrix([
-			[2.0, 1.0, 3.0],
+			[2, 1, 3],
 			[2.2, 1.3, 2.8],
 			[1.8, 0.9, 3.2],
-			[5.0, 4.0, 1.0],
+			[5, 4, 1],
 			[5.3, 4.2, 1.1],
 			[4.7, 3.8, 0.9],
-			[1.0, 5.0, 2.0],
+			[1, 5, 2],
 			[1.2, 5.3, 2.2],
 			[0.8, 4.7, 1.8],
 		]);
@@ -77,18 +69,14 @@ describe('lda', () => {
 		]);
 
 		const result = lda(dataMatrix, classesMatrixesMap);
-
-		expect(result).toBeDefined();
-		expect(result.linearDiscriminants).toBeDefined();
-		expect(Array.isArray(result.linearDiscriminants)).toBe(true);
-		expect(result.linearDiscriminants.length).toBeGreaterThan(0);
+		assertValidLdaResult(result);
 	});
 
 	it('should sort linear discriminants by eigenvalue in descending order', () => {
 		const dataMatrix = matrix([
-			[1.0, 2.0],
+			[1, 2],
 			[1.8, 2.3],
-			[5.0, 1.0],
+			[5, 1],
 			[5.2, 1.9],
 		]);
 
