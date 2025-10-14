@@ -4,10 +4,17 @@ import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 import useConfigStore from '../stores/config-store';
 import useDataMatrix from '../hooks/useDataMatrix';
-import useVectors from '../hooks/useVectors';
+import useInitialVectors from '../hooks/useInitialVectors';
 import StarCoordinates from './StarCoordinates';
+import createColormap from 'colormap';
+import { scaleQuantize } from 'd3';
+import { useEffect, useState } from 'react';
 
 function StarCoordinatesWrapper({ height, width }) {
+	const colorScale = scaleQuantize()
+		.domain([0, 5])
+		.range(createColormap({ colormap: 'viridis' }));
+
 	const normalizationMethod = useConfigStore(
 		(state) => state.normalizationMethod
 	);
@@ -15,12 +22,6 @@ function StarCoordinatesWrapper({ height, width }) {
 	const setUnitCircleRadius = useConfigStore(
 		(state) => state.setUnitCircleRadius
 	);
-
-	if (height > width) {
-		setUnitCircleRadius(width / 5);
-	} else {
-		setUnitCircleRadius(height / 5);
-	}
 
 	const selectedColumns = useStarCoordinatesStore(
 		(state) => state.selectedColumns
@@ -45,15 +46,25 @@ function StarCoordinatesWrapper({ height, width }) {
 		selectedClassColumn
 	);
 
-	const [vectors, setVectors] = useVectors(
+	const initialVectors = useInitialVectors(
 		columnsDictionary,
 		analysis,
 		numArrows
 	);
 
+	const [vectors, setVectors] = useState();
+
 	const handleVectorUpdate = (newVectors) => {
 		setVectors(newVectors);
 	};
+
+	useEffect(() => {
+		setUnitCircleRadius(height > width ? width / 5 : height / 5);
+	}, [setUnitCircleRadius, width, height]);
+
+	useEffect(() => {
+		setVectors(initialVectors);
+	}, [initialVectors]);
 
 	return (
 		vectors && (

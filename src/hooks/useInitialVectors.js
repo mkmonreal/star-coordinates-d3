@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
-import { buildPolarVector } from '../utils/vector';
+import { useMemo } from 'react';
 import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
+import { buildPolarVector } from '../utils/vector';
 
-function useVectors(columnsDictionary, analysis, numArrows) {
-	const [vectors, setVectors] = useState();
-
-	useEffect(() => {
+function useInitialVectors(columnsDictionary, analysis, numArrows) {
+	return useMemo(() => {
 		if (!columnsDictionary) {
 			return;
 		}
@@ -17,10 +15,8 @@ function useVectors(columnsDictionary, analysis, numArrows) {
 		if (DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis) {
 			columnsNames = columnsNames.slice(0, numArrows);
 		}
-		setVectors(createVectors(columnsNames));
+		return createVectors(columnsNames);
 	}, [columnsDictionary, analysis, numArrows]);
-
-	return [vectors, setVectors];
 }
 
 function createVectors(columns) {
@@ -46,4 +42,4 @@ function createVectors(columns) {
 	return vectors;
 }
 
-export default useVectors;
+export default useInitialVectors;

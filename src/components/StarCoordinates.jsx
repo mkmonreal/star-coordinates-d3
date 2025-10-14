@@ -24,17 +24,12 @@ function StarCoordinates({
 	const arrowHeadScale = unitCircleRadius / 250;
 
 	useEffect(() => {
-		currentViewBox.current = { x: -width / 2, y: -height / 2 };
-	}, [width, height]);
-
-	useEffect(() => {
 		currentVectors.current = vectors;
 		currentDataMatrix.current = dataMatrix;
-		const calculatedPoints = calculatePoints(
+		currentPoints.current = calculatePoints(
 			currentVectors.current,
 			currentDataMatrix.current
 		);
-		currentPoints.current = calculatedPoints;
 	}, [vectors, dataMatrix]);
 
 	useEffect(() => {
@@ -72,6 +67,10 @@ function StarCoordinates({
 				);
 			})
 		);
+
+		return () => {
+			// TODO: cleanup function
+		};
 	}, [width, height, unitCircleRadius]);
 
 	useEffect(() => {
@@ -263,6 +262,10 @@ function StarCoordinates({
 			d3.select(selection.node().parentNode)
 				.select('.arrow-body')
 				.attr('d', lineGenerator(getArrowbodyPath(x, y, unitCircleRadius)));
+
+			return () => {
+				// TODO: cleanup function
+			};
 		}
 	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate, dataMatrix]);
 

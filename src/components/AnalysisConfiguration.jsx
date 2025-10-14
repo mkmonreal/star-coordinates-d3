@@ -1,7 +1,6 @@
-import { Radio, Card, Flex, Select } from 'antd';
+import { Radio, Card, Flex, Select, InputNumber } from 'antd';
 import useConfigStore from '../stores/config-store';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
-import { useEffect, useState } from 'react';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
@@ -22,6 +21,9 @@ const normalizationMethodOptions = Object.values(NormalizationMethodEnum).map(
 const AnalysisConfiguration = () => {
 	const analysis = useConfigStore((state) => state.analysis);
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
+	const normalizationMethod = useConfigStore(
+		(state) => state.normalizationMethod
+	);
 	const setNormalizationMethod = useConfigStore(
 		(state) => state.setNormalizationMethod
 	);
@@ -31,51 +33,47 @@ const AnalysisConfiguration = () => {
 		(state) => state.setSelectedClassColumn
 	);
 
-	const [normalization, setNormalization] = useState(
-		normalizationMethodOptions[0].value
-	);
-	const [dimensionalityReduction, setDimensionalityReduction] = useState(
-		dimensionalityReductionOptions[0].value
-	);
+	const numArrows = useConfigStore((state) => state.numArrows);
+	const setNumArrows = useConfigStore((state) => state.setNumArrows);
 
-	useEffect(() => {
-		setNormalizationMethod(normalization);
-	}, [normalization, setNormalizationMethod]);
+	function onChangeNumArrows(value) {
+		if (!value) {
+			return;
+		}
 
-	useEffect(() => {
-		setDimensionalityReduction(analysis);
-	}, [analysis]);
-	useEffect(() => {
-		setAnalysis(dimensionalityReduction);
-	}, [dimensionalityReduction, setAnalysis]);
+		setNumArrows(value);
+	}
 
 	return (
 		<Flex vertical gap="middle">
 			<Card title="Normalization method">
 				<Radio.Group
 					block
-					value={normalization}
+					value={normalizationMethod}
 					options={normalizationMethodOptions}
 					defaultValue={normalizationMethodOptions[0].value}
 					optionType="button"
 					buttonStyle="solid"
-					onChange={(e) => setNormalization(e.target.value)}
+					onChange={(e) => {
+						setNormalizationMethod(e.target.value);
+					}}
 				></Radio.Group>
 			</Card>
 			<Card title="Dimensionality reduction">
 				<Flex gap="small" vertical>
 					<Radio.Group
 						block
-						value={dimensionalityReduction}
+						value={analysis}
 						options={dimensionalityReductionOptions}
 						defaultValue={dimensionalityReductionOptions[0].value}
 						optionType="button"
 						buttonStyle="solid"
-						onChange={(e) => setDimensionalityReduction(e.target.value)}
+						onChange={(e) => {
+							setAnalysis(e.target.value);
+						}}
 					></Radio.Group>
-					{dimensionalityReductionStatisticalTechniquesEnum.LDA ===
-					dimensionalityReduction ? (
-						<Flex gap="small" align="center">
+					{dimensionalityReductionStatisticalTechniquesEnum.LDA === analysis ? (
+						<Flex gap="small" align="center" justify="space-between">
 							<h3>Class:</h3>
 							<Select
 								style={{ width: '100%' }}
@@ -88,6 +86,17 @@ const AnalysisConfiguration = () => {
 									</Select.Option>
 								))}
 							</Select>
+						</Flex>
+					) : null}
+					{dimensionalityReductionStatisticalTechniquesEnum.PCA === analysis ||
+					dimensionalityReductionStatisticalTechniquesEnum.LDA === analysis ? (
+						<Flex gap="small" align="center" justify="space-between">
+							<h3>Number of arrows:</h3>
+							<InputNumber
+								min={0}
+								defaultValue={numArrows}
+								onChange={onChangeNumArrows}
+							/>
 						</Flex>
 					) : null}
 				</Flex>
