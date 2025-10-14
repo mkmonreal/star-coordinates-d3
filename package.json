@@ -16,6 +16,7 @@
 		"@ant-design/colors": "^7.2.0",
 		"@ant-design/icons": "^5.6.1",
 		"antd": "^5.24.3",
+		"colormap": "2.3.2",
 		"d3": "^7.9.0",
 		"eslint-plugin-unused-imports": "^4.1.4",
 		"mathjs": "^14.3.1",
@@ -46,5 +47,5 @@
 		"vite": "^6.2.0",
 		"vitest": "^3.0.9"
 	},
-	"packageManager": "pnpm@10.17.0"
+	"packageManager": "pnpm@10.18.2+sha512.9fb969fa749b3ade6035e0f109f0b8a60b5d08a1a87fdf72e337da90dcc93336e2280ca4e44f2358a649b83c17959e9993e777c2080879f3801e6f0d999ad3dd"
 }

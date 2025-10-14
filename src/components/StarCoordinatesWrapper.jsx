@@ -2,19 +2,13 @@ import PropTypes from 'prop-types';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
-import useConfigStore from '../stores/config-store';
+import { useEffect, useState } from 'react';
 import useDataMatrix from '../hooks/useDataMatrix';
 import useInitialVectors from '../hooks/useInitialVectors';
+import useConfigStore from '../stores/config-store';
 import StarCoordinates from './StarCoordinates';
-import createColormap from 'colormap';
-import { scaleQuantize } from 'd3';
-import { useEffect, useState } from 'react';
 
 function StarCoordinatesWrapper({ height, width }) {
-	const colorScale = scaleQuantize()
-		.domain([0, 5])
-		.range(createColormap({ colormap: 'viridis' }));
-
 	const normalizationMethod = useConfigStore(
 		(state) => state.normalizationMethod
 	);

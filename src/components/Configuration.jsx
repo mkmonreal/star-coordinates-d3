@@ -1,7 +1,8 @@
-import ColumnsConfiguration from './ColumnsConfiguration';
-import AnalysisConfiguration from './AnalysisConfiguration';
 import { Tabs } from 'antd';
 import PropTypes from 'prop-types';
+import AnalysisConfiguration from './AnalysisConfiguration';
+import ColumnsConfiguration from './ColumnsConfiguration';
+import VisualizationConfiguration from './VisualizationConfiguration';
 
 function Configuration({ idColumn }) {
 	return (
@@ -17,6 +18,11 @@ function Configuration({ idColumn }) {
 					label: 'Analysis configuration',
 					key: 'analysis-config',
 					children: <AnalysisConfiguration />,
+				},
+				{
+					label: 'Visualization configuration',
+					key: 'visualization-config',
+					children: <VisualizationConfiguration />,
 				},
 			]}
 		/>

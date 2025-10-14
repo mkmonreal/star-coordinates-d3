@@ -4,6 +4,8 @@ import useConfigStore from '../stores/config-store';
 import { mod, matrix, multiply } from 'mathjs';
 import { buildCartesianVector } from '../utils/vector';
 import PropTypes from 'prop-types';
+import createColormap from 'colormap';
+import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 const lineGenerator = d3.line();
 
@@ -23,14 +25,45 @@ function StarCoordinates({
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const arrowHeadScale = unitCircleRadius / 250;
 
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
+	const originalData = useStarCoordinatesStore((state) => state.originalData);
+	const colorClassColumns = useConfigStore((state) => state.colorClassColumns);
+	const setColorClassColumns = useConfigStore(
+		(state) => state.setColorClassColumns
+	);
+	const colorset = useConfigStore((state) => state.colorset);
+	useEffect(() => {
+		if (!selectedClassColumn) {
+			return;
+		}
+		const classColumnsSet = new Set(
+			originalData.map((d) => d[selectedClassColumn])
+		);
+		const colorScale = createColorScale(classColumnsSet.size - 1, colorset);
+		setColorClassColumns(
+			Array.from(classColumnsSet).reduce(
+				(colorClassColumnsMap, classColumn, classColumnIndex) => {
+					return colorClassColumnsMap.set(
+						classColumn,
+						colorScale(classColumnIndex)
+					);
+				},
+				new Map()
+			)
+		);
+	}, [setColorClassColumns, originalData, selectedClassColumn, colorset]);
+
 	useEffect(() => {
 		currentVectors.current = vectors;
 		currentDataMatrix.current = dataMatrix;
 		currentPoints.current = calculatePoints(
 			currentVectors.current,
-			currentDataMatrix.current
+			currentDataMatrix.current,
+			originalData
 		);
-	}, [vectors, dataMatrix]);
+	}, [vectors, dataMatrix, originalData]);
 
 	useEffect(() => {
 		const svg = d3.select(svgRef.current);
@@ -184,20 +217,39 @@ function StarCoordinates({
 		}
 
 		function enterDataCircle(enter) {
+			console.log('enter date cilcle', enter);
 			enter
 				.append('circle')
 				.classed('data-circle', true)
 				.attr('cx', (d) => d.x * unitCircleRadius)
 				.attr('cy', (d) => -d.y * unitCircleRadius)
-				.attr('r', 3)
-				.attr('stroke', 'red')
-				.attr('fill', 'orange');
+				.attr('r', 4)
+				.attr('stroke', 'white')
+				.attr('fill', (d) => {
+					if (!colorClassColumns) {
+						return 'orange';
+					}
+					const fill = colorClassColumns.get(
+						d.originalValue[selectedClassColumn]
+					);
+					return fill || 'orange';
+				});
 		}
 
 		function updateDataCircle(update) {
+			console.log('update date circle', update);
 			update
 				.attr('cx', (d) => d.x * unitCircleRadius)
-				.attr('cy', (d) => -d.y * unitCircleRadius);
+				.attr('cy', (d) => -d.y * unitCircleRadius)
+				.attr('fill', (d) => {
+					if (!colorClassColumns) {
+						return 'red';
+					}
+					const fill = colorClassColumns.get(
+						d.originalValue[selectedClassColumn]
+					);
+					return fill || 'orange';
+				});
 		}
 
 		function exitDataCircle(exit) {
@@ -227,7 +279,8 @@ function StarCoordinates({
 
 			const dataPoints = calculatePoints(
 				currentVectors.current,
-				currentDataMatrix.current
+				currentDataMatrix.current,
+				originalData
 			);
 
 			svg
@@ -267,7 +320,16 @@ function StarCoordinates({
 				// TODO: cleanup function
 			};
 		}
-	}, [unitCircleRadius, arrowHeadScale, vectors, onVectorUpdate, dataMatrix]);
+	}, [
+		unitCircleRadius,
+		arrowHeadScale,
+		vectors,
+		onVectorUpdate,
+		dataMatrix,
+		originalData,
+		selectedClassColumn,
+		colorClassColumns,
+	]);
 
 	return <svg className="star-coordinates" ref={svgRef}></svg>;
 }
@@ -296,7 +358,7 @@ function getArrowbodyPath(x, y, unitCircleRadius = 1) {
 	];
 }
 
-function calculatePoints(vectors, dataMatrix) {
+function calculatePoints(vectors, dataMatrix, originalData) {
 	if (!vectors) {
 		return [];
 	}
@@ -311,10 +373,19 @@ function calculatePoints(vectors, dataMatrix) {
 
 	const dataPoints = multiply(dataMatrix, vectorsMatrix);
 	const calculatedPoints = dataPoints.toArray().map((d, i) => {
-		return { id: i, x: d[0], y: d[1] };
+		return { id: i, x: d[0], y: d[1], originalValue: originalData[i] };
 	});
 
 	return calculatedPoints;
+}
+
+function createColorScale(maxDomain, colormap) {
+	const colorScale = d3
+		.scaleQuantize()
+		.domain([0, maxDomain])
+		.range(createColormap({ colormap }));
+
+	return colorScale;
 }
 
 StarCoordinates.propTypes = {
