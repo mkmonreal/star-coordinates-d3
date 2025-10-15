@@ -1,7 +1,7 @@
-import { Radio, Card, Flex, Select, InputNumber } from 'antd';
-import useConfigStore from '../stores/config-store';
+import { Card, Flex, InputNumber, Radio, Select } from 'antd';
 import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
+import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 const dimensionalityReductionOptions = Object.values(
@@ -29,6 +29,9 @@ const AnalysisConfiguration = () => {
 	);
 
 	const columns = useStarCoordinatesStore((state) => state.columns);
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
 	const setSelectedClassColumn = useStarCoordinatesStore(
 		(state) => state.setSelectedClassColumn
 	);
@@ -78,7 +81,9 @@ const AnalysisConfiguration = () => {
 							<Select
 								style={{ width: '100%' }}
 								title="Class:"
+								value={selectedClassColumn}
 								onChange={setSelectedClassColumn}
+								placeholder="Select a column"
 							>
 								{columns?.map((column) => (
 									<Select.Option key={column} value={column}>

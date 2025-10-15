@@ -1,8 +1,8 @@
 import { Card, ColorPicker, Flex, Select } from 'antd';
-import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import useConfigStore from '../stores/config-store';
 import ColorsetEnum from '../enums/colorset-enum';
-import { lab } from 'd3';
+import useConfigStore from '../stores/config-store';
+import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import { useMemo } from 'react';
 
 const DEFAULT_COLOR = '#FFA500';
 
@@ -25,7 +25,10 @@ function VisualizationConfiguration() {
 	const colorset = useConfigStore((state) => state.colorset);
 	const setColorset = useConfigStore((state) => state.setColorset);
 	const colorClassColumns = useConfigStore((state) => state.colorClassColumns);
-	const valuesSet = new Set(originalData.map((d) => d[selectedClassColumn]));
+	const valuesSet = useMemo(
+		() => new Set(originalData.map((d) => d[selectedClassColumn])),
+		[originalData, selectedClassColumn]
+	);
 
 	return (
 		<Flex vertical gap="middle">
@@ -36,8 +39,9 @@ function VisualizationConfiguration() {
 						<Select
 							style={{ width: '100%' }}
 							title="Class:"
-							defaultValue={selectedClassColumn}
+							value={selectedClassColumn}
 							onChange={setSelectedClassColumn}
+							placeholder="Select a column"
 						>
 							{columns?.map((column) => (
 								<Select.Option key={column} value={column}>
@@ -63,25 +67,27 @@ function VisualizationConfiguration() {
 					</Flex>
 					{selectedClassColumn && (
 						<Flex vertical gap="middle" style={{ width: '100%' }}>
-							{Array.from(valuesSet.values()).map((d) => (
-								<Flex
-									key={d}
-									align="center"
-									justify="space-between"
-									style={{ width: '100%' }}
-								>
-									<span>{d}</span>
-									<ColorPicker
-										value={
-											colorClassColumns
-												? colorClassColumns.get(d)
-												: DEFAULT_COLOR
-										}
-										size="small"
-										disabled
-									/>
-								</Flex>
-							))}
+							{Array.from(valuesSet.values())
+								.sort()
+								.map((d) => (
+									<Flex
+										key={d}
+										align="center"
+										justify="space-between"
+										style={{ width: '100%' }}
+									>
+										<span>{d}</span>
+										<ColorPicker
+											value={
+												colorClassColumns
+													? colorClassColumns.get(d)
+													: DEFAULT_COLOR
+											}
+											size="small"
+											disabled
+										/>
+									</Flex>
+								))}
 						</Flex>
 					)}
 				</Flex>
