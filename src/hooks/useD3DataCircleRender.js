@@ -2,13 +2,15 @@ import { select } from 'd3';
 import { useEffect } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import useD3ColorScale from './useD3ColorScale';
 
 function useD3DataCircleRender(svgRef, points) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
-	const colorClassColumns = useConfigStore((state) => state.colorClassColumns);
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
 	);
+	const { selectColor } = useD3ColorScale(selectedClassColumn);
+
 	useEffect(() => {
 		if (!points) {
 			return;
@@ -25,31 +27,25 @@ function useD3DataCircleRender(svgRef, points) {
 					enterDataCircle(
 						enter,
 						unitCircleRadius,
-						colorClassColumns,
+						selectColor,
 						selectedClassColumn
 					),
 				(update) =>
 					updateDataCircle(
 						update,
 						unitCircleRadius,
-						colorClassColumns,
+						selectColor,
 						selectedClassColumn
 					),
 				exitDataCircle
 			);
-	}, [
-		svgRef,
-		points,
-		unitCircleRadius,
-		colorClassColumns,
-		selectedClassColumn,
-	]);
+	}, [svgRef, points, unitCircleRadius, selectColor, selectedClassColumn]);
 }
 
 function enterDataCircle(
 	enter,
 	unitCircleRadius,
-	colorClassColumns,
+	selectColor,
 	selectedClassColumn
 ) {
 	enter
@@ -60,10 +56,10 @@ function enterDataCircle(
 		.attr('r', 4)
 		.attr('stroke', 'black')
 		.attr('fill', (d) => {
-			if (!colorClassColumns) {
+			if (!selectColor) {
 				return 'orange';
 			}
-			const fill = colorClassColumns.get(d.originalValue[selectedClassColumn]);
+			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
 		});
 }
@@ -71,17 +67,17 @@ function enterDataCircle(
 function updateDataCircle(
 	update,
 	unitCircleRadius,
-	colorClassColumns,
+	selectColor,
 	selectedClassColumn
 ) {
 	update
 		.attr('cx', (d) => d.x * unitCircleRadius)
 		.attr('cy', (d) => -d.y * unitCircleRadius)
 		.attr('fill', (d) => {
-			if (!colorClassColumns) {
+			if (!selectColor) {
 				return 'red';
 			}
-			const fill = colorClassColumns.get(d.originalValue[selectedClassColumn]);
+			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
 		});
 }

@@ -1,13 +1,13 @@
 import { Card, ColorPicker, Flex, Select } from 'antd';
 import ColorsetEnum from '../enums/colorset-enum';
+import useD3ColorScale from '../hooks/useD3ColorScale';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import { useMemo } from 'react';
 
 const DEFAULT_COLOR = '#FFA500';
 
 const colorsetOptions = Object.values(ColorsetEnum).map((colorset) => ({
-	label: colorset,
+	label: colorset.name,
 	value: colorset,
 }));
 
@@ -20,15 +20,9 @@ function VisualizationConfiguration() {
 		(state) => state.setSelectedClassColumn
 	);
 
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
-
-	const colorset = useConfigStore((state) => state.colorset);
 	const setColorset = useConfigStore((state) => state.setColorset);
-	const colorClassColumns = useConfigStore((state) => state.colorClassColumns);
-	const valuesSet = useMemo(
-		() => new Set(originalData.map((d) => d[selectedClassColumn])),
-		[originalData, selectedClassColumn]
-	);
+
+	const { classesSet, selectColor } = useD3ColorScale(selectedClassColumn);
 
 	return (
 		<Flex vertical gap="middle">
@@ -55,11 +49,16 @@ function VisualizationConfiguration() {
 						<Select
 							style={{ width: '100%' }}
 							title="Class:"
-							defaultValue={colorset}
-							onChange={setColorset}
+							defaultValue={ColorsetEnum.VIRIDIS.name}
+							onChange={(value) => {
+								const newColorset = colorsetOptions.find(
+									(option) => value === option.label
+								);
+								setColorset(newColorset.value);
+							}}
 						>
 							{colorsetOptions?.map((colorset) => (
-								<Select.Option key={colorset} value={colorset.value}>
+								<Select.Option key={colorset.label} value={colorset.label}>
 									{colorset.label}
 								</Select.Option>
 							))}
@@ -67,7 +66,7 @@ function VisualizationConfiguration() {
 					</Flex>
 					{selectedClassColumn && (
 						<Flex vertical gap="middle" style={{ width: '100%' }}>
-							{Array.from(valuesSet.values())
+							{Array.from(classesSet.values())
 								.sort()
 								.map((d) => (
 									<Flex
@@ -78,11 +77,7 @@ function VisualizationConfiguration() {
 									>
 										<span>{d}</span>
 										<ColorPicker
-											value={
-												colorClassColumns
-													? colorClassColumns.get(d)
-													: DEFAULT_COLOR
-											}
+											value={selectColor ? selectColor(d) : DEFAULT_COLOR}
 											size="small"
 											disabled
 										/>

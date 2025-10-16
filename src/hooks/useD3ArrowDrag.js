@@ -4,17 +4,24 @@ import { useEffect, useRef } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import { buildCartesianVector } from '../utils/vector';
+import useD3ColorScale from './useD3ColorScale';
 
 const lineGenerator = line();
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const arrowHeadScale = unitCircleRadius / 250;
+
+	const originalData = useStarCoordinatesStore((state) => state.originalData);
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
+
+	const { selectColor } = useD3ColorScale(selectedClassColumn);
+
 	const currentPoints = useRef(points);
 	const currentVectors = useRef(vectors);
 	const currentDataMatrix = useRef(dataMatrix);
-
-	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
 	useEffect(() => {
 		currentVectors.current = vectors;
@@ -35,10 +42,12 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 						dragHandler(
 							e,
 							svg,
+							selectColor,
 							currentVectors,
 							currentDataMatrix,
 							currentPoints,
 							originalData,
+							selectedClassColumn,
 							unitCircleRadius,
 							arrowHeadScale
 						);
@@ -50,16 +59,26 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 					})
 			)
 		);
-	}, [setVectors, svgRef, originalData, unitCircleRadius, arrowHeadScale]);
+	}, [
+		setVectors,
+		selectColor,
+		svgRef,
+		originalData,
+		selectedClassColumn,
+		unitCircleRadius,
+		arrowHeadScale,
+	]);
 }
 
 function dragHandler(
 	e,
 	svg,
+	selectColor,
 	currentVectors,
 	currentDataMatrix,
 	currentPoints,
 	originalData,
+	selectedClassColumn,
 	unitCircleRadius,
 	arrowHeadScale
 ) {
@@ -84,11 +103,8 @@ function dragHandler(
 		.selectAll('.arrow')
 		.data(currentVectors.current, (d) => d.id)
 		.join(
-			(enter) => {
-				console.log('enter', enter);
-			},
+			(enter) => {},
 			(update) => {
-				console.log('update', update);
 				update.call((arrow) => {
 					arrow
 						.select('.arrow-head')
@@ -118,9 +134,7 @@ function dragHandler(
 						);
 				});
 			},
-			(exit) => {
-				console.log('exit', exit);
-			}
+			(exit) => {}
 		);
 
 	svg
@@ -128,7 +142,6 @@ function dragHandler(
 		.data(currentPoints.current, (point) => `${point.id}`)
 		.join(
 			(enter) => {
-				console.log(enter);
 				enter
 					.append('circle')
 					.classed('data-circle', true)
@@ -137,26 +150,17 @@ function dragHandler(
 					.attr('r', 4)
 					.attr('stroke', 'black')
 					.attr('fill', (d) => {
-						// if (!colorClassColumns) {
-						// 	return 'orange';
-						// }
-						// const fill = colorClassColumns.get(d.originalValue[selectedClassColumn]);
-						// return fill || 'orange';
-						return 'orange';
+						if (!selectColor) {
+							return 'orange';
+						}
+						const fill = selectColor(d.originalValue[selectedClassColumn]);
+						return fill || 'orange';
 					});
 			},
 			(update) => {
 				update
 					.attr('cx', (d) => d.x * unitCircleRadius)
-					.attr('cy', (d) => -d.y * unitCircleRadius)
-					.attr('fill', (d) => {
-						// if (!colorClassColumns) {
-						// 	return 'red';
-						// }
-						// const fill = colorClassColumns.get(d.originalValue[selectedClassColumn]);
-						// return fill || 'orange';
-						return 'orange';
-					});
+					.attr('cy', (d) => -d.y * unitCircleRadius);
 			},
 			(exit) => {
 				exit.remove();

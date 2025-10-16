@@ -14,7 +14,6 @@ function StarCoordinates({
 	onVectorUpdate,
 	dataMatrix,
 }) {
-	console.log('render');
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
 	const points = useMemo(() => {
