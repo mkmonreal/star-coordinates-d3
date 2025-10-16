@@ -3,8 +3,8 @@ import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import useConfigStore from '../stores/config-store';
 import { useState } from 'react';
 
-const onChange = (onCheck, onUncheck, e, column) => {
-	if (e.target.checked) {
+const onChange = (onCheck, onUncheck, checked, column) => {
+	if (checked) {
 		onCheck(column);
 	} else {
 		onUncheck(column);
@@ -58,7 +58,12 @@ function ColumnsConfiguration({ idColumn }) {
 						<Checkbox
 							key={column}
 							onChange={(e) =>
-								onChange(addSelectedColumn, removeSelectedColumn, e, column)
+								onChange(
+									addSelectedColumn,
+									removeSelectedColumn,
+									e.target.checked,
+									column
+								)
 							}
 							checked={true}
 						>
@@ -83,7 +88,12 @@ function ColumnsConfiguration({ idColumn }) {
 							<Checkbox
 								key={column}
 								onChange={(e) =>
-									onChange(addSelectedColumn, removeSelectedColumn, e, column)
+									onChange(
+										addSelectedColumn,
+										removeSelectedColumn,
+										e.target.checked,
+										column
+									)
 								}
 							>
 								{column}

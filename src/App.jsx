@@ -1,14 +1,13 @@
 import './App.css';
 
-import { FloatButton, Drawer, Empty } from 'antd';
-import { SettingFilled, FileAddFilled } from '@ant-design/icons';
-import { useState, useRef } from 'react';
-import StarCoordinates from './components/StarCoordinates';
-import useStarCoordinatesStore from './stores/star-coorditantes-store';
-import parseCsv from './js/csv-parser';
-import useConfigStore from './stores/config-store';
+import { FileAddFilled, SettingFilled } from '@ant-design/icons';
+import { Drawer, Empty, Flex, FloatButton } from 'antd';
+import { useRef, useState } from 'react';
 import Configuration from './components/Configuration';
 import StarCoordinatesWrapper from './components/StarCoordinatesWrapper';
+import parseCsv from './js/csv-parser';
+import useConfigStore from './stores/config-store';
+import useStarCoordinatesStore from './stores/star-coorditantes-store';
 
 const onFileReaderLoad = (
 	event,
@@ -91,7 +90,11 @@ function App() {
 	const fileChangeFunc = (ev) => onFileInputChange(ev, fileReaderFunc);
 
 	return (
-		<>
+		<Flex
+			align="center"
+			justify="center"
+			style={{ height: '100vh', width: '100%' }}
+		>
 			{validColumns.length ? (
 				<StarCoordinatesWrapper width={width} height={height} />
 			) : (
@@ -125,7 +128,7 @@ function App() {
 				style={{ display: 'none' }}
 				onChange={(event) => fileChangeFunc(event)}
 			/>
-		</>
+		</Flex>
 	);
 }
 
