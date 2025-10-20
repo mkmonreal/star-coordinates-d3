@@ -30,6 +30,9 @@ const AnalysisConfiguration = () => {
 	);
 
 	const columns = useStarCoordinatesStore((state) => state.columns);
+	const selectedColumns = useStarCoordinatesStore(
+		(state) => state.selectedColumns
+	);
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
 	);
@@ -59,7 +62,6 @@ const AnalysisConfiguration = () => {
 					optionType="button"
 					buttonStyle="solid"
 					onChange={(e) => {
-						console.log(e);
 						setNormalizationMethod(e.target.value);
 					}}
 					disabled={
@@ -113,6 +115,7 @@ const AnalysisConfiguration = () => {
 							<h3>Number of arrows:</h3>
 							<InputNumber
 								min={0}
+								max={selectedColumns.length}
 								defaultValue={numArrows}
 								onChange={onChangeNumArrows}
 							/>
