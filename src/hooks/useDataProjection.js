@@ -60,7 +60,7 @@ function useDataProjection(
 
 				eigenDecomposition = createEigenDecomposition(
 					analysis,
-					originalMatrix,
+					normalizedMatrix,
 					classesIndexesMap
 				);
 
@@ -81,7 +81,7 @@ function useDataProjection(
 				}
 
 				transformedDataMatrix = multiply(normalizedMatrix, eigenVectorsMatrix);
-				dataMatrix = transformedDataMatrix;
+				dataMatrix = normalizationFunc(transformedDataMatrix);
 
 				columnsIndexMap = eigenDecomposition.reduce((map, eigen, index) => {
 					map.set(eigen.name, index);
@@ -112,9 +112,9 @@ function selectNormalizationMethod(method) {
 	}
 }
 
-function createEigenDecomposition(analysis, originalMatrix, classesIndexesMap) {
+function createEigenDecomposition(analysis, matrix, classesIndexesMap) {
 	if (DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis) {
-		const { principalComponents } = pca(originalMatrix);
+		const { principalComponents } = pca(matrix);
 		return principalComponents;
 	} else if (
 		DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
@@ -122,7 +122,7 @@ function createEigenDecomposition(analysis, originalMatrix, classesIndexesMap) {
 		if (!classesIndexesMap || 0 === classesIndexesMap.size) {
 			return [];
 		}
-		const { linearDiscriminants } = lda(originalMatrix, classesIndexesMap);
+		const { linearDiscriminants } = lda(matrix, classesIndexesMap);
 		return linearDiscriminants;
 	}
 }

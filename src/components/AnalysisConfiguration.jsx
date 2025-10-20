@@ -3,6 +3,7 @@ import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimension
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 
 const dimensionalityReductionOptions = Object.values(
 	dimensionalityReductionStatisticalTechniquesEnum
@@ -58,8 +59,13 @@ const AnalysisConfiguration = () => {
 					optionType="button"
 					buttonStyle="solid"
 					onChange={(e) => {
+						console.log(e);
 						setNormalizationMethod(e.target.value);
 					}}
+					disabled={
+						DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis ||
+						DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
+					}
 				></Radio.Group>
 			</Card>
 			<Card title="Dimensionality reduction">
@@ -72,7 +78,15 @@ const AnalysisConfiguration = () => {
 						optionType="button"
 						buttonStyle="solid"
 						onChange={(e) => {
-							setAnalysis(e.target.value);
+							const value = e.target.value;
+							if (
+								DimensionalityReductionStatisticalTechniquesEnum.PCA ===
+									value ||
+								DimensionalityReductionStatisticalTechniquesEnum.LDA === value
+							) {
+								setNormalizationMethod(NormalizationMethodEnum.Z_SCORE);
+							}
+							setAnalysis(value);
 						}}
 					></Radio.Group>
 					{dimensionalityReductionStatisticalTechniquesEnum.LDA === analysis ? (

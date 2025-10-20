@@ -14,13 +14,13 @@ function StarCoordinates({
 	onVectorUpdate,
 	dataMatrix,
 }) {
+	const svgRef = useD3SVGSetup(width, height);
+
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
 	const points = useMemo(() => {
 		return calculatePoints(vectors, dataMatrix, originalData);
 	}, [vectors, dataMatrix, originalData]);
-
-	const svgRef = useD3SVGSetup(width, height);
 
 	useD3ArrowRender(svgRef, vectors);
 	useD3DataCircleRender(svgRef, points);

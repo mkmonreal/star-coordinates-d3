@@ -1,15 +1,14 @@
 import {
-	matrix,
-	matrixFromColumns,
-	subtract,
-	transpose,
-	multiply,
 	add,
 	eigs,
 	inv,
+	matrix,
+	matrixFromColumns,
 	mean,
+	multiply,
+	subtract,
+	transpose,
 } from 'mathjs';
-import standarizeData from './data/standarize';
 import { initializeMatrixArrayWithValues } from '../utils/array';
 
 export function lda(dataMatrix, classesIndexesMap) {
@@ -17,10 +16,9 @@ export function lda(dataMatrix, classesIndexesMap) {
 		return;
 	}
 
-	const standarizedData = standarizeData(dataMatrix);
 	const generalMeans = matrix(
 		matrixFromColumns(
-			standarizedData
+			dataMatrix
 				.columns()
 				.map((column) => column.toArray().map((x) => x[0]))
 				.map((column) => mean(column))
@@ -32,9 +30,7 @@ export function lda(dataMatrix, classesIndexesMap) {
 	for (const classValue of classes) {
 		const classIndexes = classesIndexesMap.get(classValue);
 		const standarizedClassMatrix = matrix(
-			standarizedData
-				.toArray()
-				.filter((_, index) => classIndexes.includes(index))
+			dataMatrix.toArray().filter((_, index) => classIndexes.includes(index))
 		);
 		const classMean = matrix(
 			matrixFromColumns(
@@ -87,7 +83,7 @@ export function lda(dataMatrix, classesIndexesMap) {
 
 	return {
 		linearDiscriminants: eigen.eigenvectors
-			.sort((a, b) => subtract(b.value, a.value))
+			.toSorted((a, b) => subtract(b.value, a.value))
 			.map(createLinearDiscriminant),
 	};
 }

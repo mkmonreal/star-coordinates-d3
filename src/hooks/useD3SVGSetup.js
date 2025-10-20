@@ -5,7 +5,12 @@ import useConfigStore from '../stores/config-store';
 function useD3SVGSetup(width, height) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const svgRef = useRef();
-	const currentViewBox = useRef({ x: -width / 2, y: -height / 2 });
+	const currentViewBox = useRef({
+		x: -width / 2,
+		y: -height / 2,
+		width,
+		height,
+	});
 
 	useEffect(() => {
 		const svg = select(svgRef.current);
@@ -35,10 +40,10 @@ function useD3SVGSetup(width, height) {
 			drag().on('drag', (e) => {
 				const x = currentViewBox.current.x - e.dx;
 				const y = currentViewBox.current.y - e.dy;
-				currentViewBox.current = { x, y };
+				currentViewBox.current = { ...currentViewBox.current, x, y };
 				svg.attr(
 					'viewBox',
-					`${currentViewBox.current.x} ${currentViewBox.current.y} ${width} ${height}`
+					`${currentViewBox.current.x} ${currentViewBox.current.y} ${currentViewBox.current.width} ${currentViewBox.current.height}`
 				);
 			})
 		);
