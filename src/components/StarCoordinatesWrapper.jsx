@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 import { useEffect, useState } from 'react';
-import useDataMatrix from '../hooks/useDataMatrix';
+import useDataProjection from '../hooks/useDataProjection';
 import useInitialVectors from '../hooks/useInitialVectors';
 import useConfigStore from '../stores/config-store';
 import StarCoordinates from './StarCoordinates';
@@ -31,7 +31,7 @@ function StarCoordinatesWrapper({ height, width }) {
 
 	const analysis = useConfigStore((state) => state.analysis);
 
-	const { dataMatrix, columnsDictionary } = useDataMatrix(
+	const { dataMatrix, columnsIndexMap } = useDataProjection(
 		originalData,
 		selectedColumns,
 		normalizationMethod,
@@ -41,7 +41,7 @@ function StarCoordinatesWrapper({ height, width }) {
 	);
 
 	const initialVectors = useInitialVectors(
-		columnsDictionary,
+		columnsIndexMap,
 		analysis,
 		numArrows
 	);

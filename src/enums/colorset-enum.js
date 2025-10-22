@@ -1,11 +1,19 @@
+import {
+	interpolateBlues,
+	interpolateGreens,
+	interpolateGreys,
+	interpolateOranges,
+	interpolatePurples,
+	interpolateViridis,
+} from 'd3';
+
 const ColorsetEnum = Object.freeze({
-	JET: 'jet',
-	HSV: 'hsv',
-	HOT: 'hot',
-	COOL: 'cool',
-	SPRING: 'spring',
-	SUMMER: 'summer',
-	VIRIDIS: 'viridis',
+	BLUES: { name: 'Blues', interpolate: interpolateBlues },
+	GREENS: { name: 'Greens', interpolate: interpolateGreens },
+	GREYS: { name: 'Greys', interpolate: interpolateGreys },
+	ORANGES: { name: 'Oranges', interpolate: interpolateOranges },
+	PURPLES: { name: 'Purples', interpolate: interpolatePurples },
+	VIRIDIS: { name: 'Viridis', interpolate: interpolateViridis },
 });
 
 export default ColorsetEnum;
