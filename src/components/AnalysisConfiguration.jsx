@@ -1,12 +1,11 @@
 import { Card, Flex, InputNumber, Radio, Select } from 'antd';
-import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 const dimensionalityReductionOptions = Object.values(
-	dimensionalityReductionStatisticalTechniquesEnum
+	DimensionalityReductionEnum
 ).map((option) => ({
 	label: option,
 	value: option,
@@ -65,8 +64,8 @@ const AnalysisConfiguration = () => {
 						setNormalizationMethod(e.target.value);
 					}}
 					disabled={
-						DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis ||
-						DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
+						DimensionalityReductionEnum.PCA === analysis ||
+						DimensionalityReductionEnum.LDA === analysis
 					}
 				></Radio.Group>
 			</Card>
@@ -82,16 +81,15 @@ const AnalysisConfiguration = () => {
 						onChange={(e) => {
 							const value = e.target.value;
 							if (
-								DimensionalityReductionStatisticalTechniquesEnum.PCA ===
-									value ||
-								DimensionalityReductionStatisticalTechniquesEnum.LDA === value
+								DimensionalityReductionEnum.PCA === value ||
+								DimensionalityReductionEnum.LDA === value
 							) {
 								setNormalizationMethod(NormalizationMethodEnum.Z_SCORE);
 							}
 							setAnalysis(value);
 						}}
 					></Radio.Group>
-					{dimensionalityReductionStatisticalTechniquesEnum.LDA === analysis ? (
+					{DimensionalityReductionEnum.LDA === analysis ? (
 						<Flex gap="small" align="center" justify="space-between">
 							<h3>Class:</h3>
 							<Select
@@ -109,8 +107,8 @@ const AnalysisConfiguration = () => {
 							</Select>
 						</Flex>
 					) : null}
-					{dimensionalityReductionStatisticalTechniquesEnum.PCA === analysis ||
-					dimensionalityReductionStatisticalTechniquesEnum.LDA === analysis ? (
+					{DimensionalityReductionEnum.PCA === analysis ||
+					DimensionalityReductionEnum.LDA === analysis ? (
 						<Flex gap="small" align="center" justify="space-between">
 							<h3>Number of arrows:</h3>
 							<InputNumber

@@ -1,11 +1,11 @@
 import { matrix, matrixFromColumns, multiply } from 'mathjs';
 import { useMemo } from 'react';
-import DimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 import { pca } from '../js/pca';
 import { lda } from '../js/lda';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 function useDataProjection(
 	originalData,
@@ -39,14 +39,14 @@ function useDataProjection(
 		dataMatrix = normalizedMatrix;
 
 		switch (analysis) {
-			case DimensionalityReductionStatisticalTechniquesEnum.NONE:
+			case DimensionalityReductionEnum.NONE:
 				columnsIndexMap = selectedColumns.reduce((map, column, index) => {
 					map.set(column, index);
 					return map;
 				}, new Map());
 				return { dataMatrix, columnsIndexMap };
-			case DimensionalityReductionStatisticalTechniquesEnum.LDA:
-			case DimensionalityReductionStatisticalTechniquesEnum.PCA:
+			case DimensionalityReductionEnum.LDA:
+			case DimensionalityReductionEnum.PCA:
 				if (selectedClassColumn) {
 					classesIndexesMap = originalData.reduce((acc, value, index) => {
 						const className = value[selectedClassColumn];
@@ -113,12 +113,10 @@ function selectNormalizationMethod(method) {
 }
 
 function createEigenDecomposition(analysis, matrix, classesIndexesMap) {
-	if (DimensionalityReductionStatisticalTechniquesEnum.PCA === analysis) {
+	if (DimensionalityReductionEnum.PCA === analysis) {
 		const { principalComponents } = pca(matrix);
 		return principalComponents;
-	} else if (
-		DimensionalityReductionStatisticalTechniquesEnum.LDA === analysis
-	) {
+	} else if (DimensionalityReductionEnum.LDA === analysis) {
 		if (!classesIndexesMap || 0 === classesIndexesMap.size) {
 			return [];
 		}

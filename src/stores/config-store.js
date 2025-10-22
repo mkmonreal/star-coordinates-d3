@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { orange, volcano } from '@ant-design/colors';
-import dimensionalityReductionStatisticalTechniquesEnum from '../enums/dimensionality-reduction-statistical-techniques-enum';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import ColorsetEnum from '../enums/colorset-enum';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 const useConfigStore = create((set) => ({
 	idColumn: '',
@@ -14,7 +14,7 @@ const useConfigStore = create((set) => ({
 	stroke: volcano.primary,
 	colorset: ColorsetEnum.VIRIDIS,
 	normalizationMethod: NormalizationMethodEnum.MIN_MAX,
-	analysis: dimensionalityReductionStatisticalTechniquesEnum.NONE,
+	analysis: DimensionalityReductionEnum.NONE,
 	numArrows: 3,
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
