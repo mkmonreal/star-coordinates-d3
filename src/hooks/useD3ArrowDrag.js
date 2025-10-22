@@ -1,12 +1,17 @@
-import { drag, line, select } from 'd3';
-import { matrix, mod, multiply } from 'mathjs';
+import { drag, select } from 'd3';
+import { matrix, multiply } from 'mathjs';
 import { useEffect, useRef } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import { enterArrows, exitArrows, updateArrows } from '../utils/d3-arrow';
 import { buildCartesianVector } from '../utils/vector';
 import useD3ColorScale from './useD3ColorScale';
-
-const lineGenerator = line();
+import { calculatePoints } from '../utils/data-projection';
+import {
+	enterDataCircle,
+	exitDataCircle,
+	updateDataCircle,
+} from '../utils/d3-data-circle';
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
@@ -39,7 +44,7 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 						arrowHead.style('cursor', 'grabbing');
 					})
 					.on('drag', (e) => {
-						dragHandler(
+						dragHandler({
 							e,
 							svg,
 							selectColor,
@@ -49,8 +54,8 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 							originalData,
 							selectedClassColumn,
 							unitCircleRadius,
-							arrowHeadScale
-						);
+							arrowHeadScale,
+						});
 					})
 					.on('end', () => {
 						svg.style('cursor', 'move');
@@ -70,7 +75,7 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	]);
 }
 
-function dragHandler(
+function dragHandler({
 	e,
 	svg,
 	selectColor,
@@ -80,8 +85,8 @@ function dragHandler(
 	originalData,
 	selectedClassColumn,
 	unitCircleRadius,
-	arrowHeadScale
-) {
+	arrowHeadScale,
+}) {
 	const prevVector = currentVectors.current.find(
 		(vector) => e.subject.id === vector.id
 	);
@@ -103,38 +108,13 @@ function dragHandler(
 		.selectAll('.arrow')
 		.data(currentVectors.current, (d) => d.id)
 		.join(
-			(enter) => {},
-			(update) => {
-				update.call((arrow) => {
-					arrow
-						.select('.arrow-head')
-						.attr('d', (d) =>
-							lineGenerator(
-								getArrowheadPath(
-									{
-										x: d.cartesian.x * unitCircleRadius,
-										y: d.cartesian.y * unitCircleRadius,
-									},
-									arrowHeadScale
-								)
-							)
-						)
-						.attr(
-							'transform',
-							(d) =>
-								`rotate(${calculateArrowheadRotation(d.cartesian.x, d.cartesian.y, d.polar.angle, unitCircleRadius)})`
-						);
-
-					arrow
-						.select('.arrow-body')
-						.attr('d', (d) =>
-							lineGenerator(
-								getArrowbodyPath(d.cartesian.x, d.cartesian.y, unitCircleRadius)
-							)
-						);
-				});
+			(enter) => {
+				enterArrows(enter, unitCircleRadius, arrowHeadScale);
 			},
-			(exit) => {}
+			(update) => {
+				updateArrows(update, unitCircleRadius, arrowHeadScale);
+			},
+			exitArrows
 		);
 
 	svg
@@ -142,75 +122,23 @@ function dragHandler(
 		.data(currentPoints.current, (point) => `${point.id}`)
 		.join(
 			(enter) => {
-				enter
-					.append('circle')
-					.classed('data-circle', true)
-					.attr('cx', (d) => d.x * unitCircleRadius)
-					.attr('cy', (d) => -d.y * unitCircleRadius)
-					.attr('r', 4)
-					.attr('stroke', 'black')
-					.attr('fill', (d) => {
-						if (!selectColor) {
-							return 'orange';
-						}
-						const fill = selectColor(d.originalValue[selectedClassColumn]);
-						return fill || 'orange';
-					});
+				enterDataCircle(
+					enter,
+					unitCircleRadius,
+					selectColor,
+					selectedClassColumn
+				);
 			},
 			(update) => {
-				update
-					.attr('cx', (d) => d.x * unitCircleRadius)
-					.attr('cy', (d) => -d.y * unitCircleRadius);
+				updateDataCircle(
+					update,
+					unitCircleRadius,
+					selectColor,
+					selectedClassColumn
+				);
 			},
-			(exit) => {
-				exit.remove();
-			}
+			exitDataCircle
 		);
-}
-
-function getArrowheadPath({ x, y }, ratio = 1) {
-	y = -y;
-	return [
-		[x - 15 * ratio, y],
-		[x - 18 * ratio, y + 6 * ratio],
-		[x, y],
-		[x - 18 * ratio, y - 6 * ratio],
-		[x - 15 * ratio, y],
-	];
-}
-
-function getArrowbodyPath(x, y, unitCircleRadius = 1) {
-	y = -y;
-	return [
-		[0, 0],
-		[x * unitCircleRadius, y * unitCircleRadius],
-	];
-}
-
-function calculateArrowheadRotation(x, y, angle, unitCircleRadius = 1) {
-	y = -y;
-	return `${mod(360 - angle, 360)} ${x * unitCircleRadius}, ${y * unitCircleRadius}`;
-}
-
-function calculatePoints(vectors, dataMatrix, originalData) {
-	if (!vectors) {
-		return [];
-	}
-
-	const vectorsMatrix = matrix(
-		vectors.map((vector) => [vector.cartesian.x, vector.cartesian.y])
-	);
-
-	if (dataMatrix.size()[1] !== vectorsMatrix.size()[0]) {
-		return [];
-	}
-
-	const dataPoints = multiply(dataMatrix, vectorsMatrix);
-	const calculatedPoints = dataPoints.toArray().map((d, i) => {
-		return { id: i, x: d[0], y: d[1], originalValue: originalData[i] };
-	});
-
-	return calculatedPoints;
 }
 
 export default useD3ArrowDrag;

@@ -2,6 +2,11 @@ import { select } from 'd3';
 import { useEffect } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import {
+	enterDataCircle,
+	exitDataCircle,
+	updateDataCircle,
+} from '../utils/d3-data-circle';
 import useD3ColorScale from './useD3ColorScale';
 
 function useD3DataCircleRender(svgRef, points) {
@@ -40,50 +45,6 @@ function useD3DataCircleRender(svgRef, points) {
 				exitDataCircle
 			);
 	}, [svgRef, points, unitCircleRadius, selectColor, selectedClassColumn]);
-}
-
-function enterDataCircle(
-	enter,
-	unitCircleRadius,
-	selectColor,
-	selectedClassColumn
-) {
-	enter
-		.append('circle')
-		.classed('data-circle', true)
-		.attr('cx', (d) => d.x * unitCircleRadius)
-		.attr('cy', (d) => -d.y * unitCircleRadius)
-		.attr('r', 4)
-		.attr('stroke', 'black')
-		.attr('fill', (d) => {
-			if (!selectColor) {
-				return 'orange';
-			}
-			const fill = selectColor(d.originalValue[selectedClassColumn]);
-			return fill || 'orange';
-		});
-}
-
-function updateDataCircle(
-	update,
-	unitCircleRadius,
-	selectColor,
-	selectedClassColumn
-) {
-	update
-		.attr('cx', (d) => d.x * unitCircleRadius)
-		.attr('cy', (d) => -d.y * unitCircleRadius)
-		.attr('fill', (d) => {
-			if (!selectColor) {
-				return 'orange';
-			}
-			const fill = selectColor(d.originalValue[selectedClassColumn]);
-			return fill || 'orange';
-		});
-}
-
-function exitDataCircle(exit) {
-	exit.remove();
 }
 
 export default useD3DataCircleRender;
