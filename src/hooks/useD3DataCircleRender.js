@@ -75,7 +75,7 @@ function updateDataCircle(
 		.attr('cy', (d) => -d.y * unitCircleRadius)
 		.attr('fill', (d) => {
 			if (!selectColor) {
-				return 'red';
+				return 'orange';
 			}
 			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
