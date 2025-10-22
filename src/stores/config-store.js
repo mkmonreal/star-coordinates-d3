@@ -15,7 +15,7 @@ const useConfigStore = create((set) => ({
 	colorset: ColorsetEnum.VIRIDIS,
 	normalizationMethod: NormalizationMethodEnum.MIN_MAX,
 	analysis: DimensionalityReductionEnum.NONE,
-	numArrows: 3,
+	vectorsInitialized: false,
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
 	setSelectedVectors: (selectedVectors) => set({ selectedVectors }),
@@ -26,7 +26,7 @@ const useConfigStore = create((set) => ({
 	setColorset: (colorset) => set({ colorset }),
 	setNormalizationMethod: (normalizationMethod) => set({ normalizationMethod }),
 	setAnalysis: (analysis) => set({ analysis }),
-	setNumArrows: (numArrows) => set({ numArrows }),
+	setVectorsInitialized: (vectorsInitialized) => set({ vectorsInitialized }),
 }));
 
 export default useConfigStore;

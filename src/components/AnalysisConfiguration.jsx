@@ -1,8 +1,8 @@
-import { Card, Flex, InputNumber, Radio, Select } from 'antd';
+import { Card, Flex, Radio, Select } from 'antd';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 const dimensionalityReductionOptions = Object.values(
 	DimensionalityReductionEnum
@@ -19,6 +19,9 @@ const normalizationMethodOptions = Object.values(NormalizationMethodEnum).map(
 );
 
 const AnalysisConfiguration = () => {
+	const setVectorsInitialized = useConfigStore(
+		(state) => state.setVectorsInitialized
+	);
 	const analysis = useConfigStore((state) => state.analysis);
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 	const normalizationMethod = useConfigStore(
@@ -39,17 +42,6 @@ const AnalysisConfiguration = () => {
 		(state) => state.setSelectedClassColumn
 	);
 
-	const numArrows = useConfigStore((state) => state.numArrows);
-	const setNumArrows = useConfigStore((state) => state.setNumArrows);
-
-	function onChangeNumArrows(value) {
-		if (!value) {
-			return;
-		}
-
-		setNumArrows(value);
-	}
-
 	return (
 		<Flex vertical gap="middle">
 			<Card title="Normalization method">
@@ -63,10 +55,6 @@ const AnalysisConfiguration = () => {
 					onChange={(e) => {
 						setNormalizationMethod(e.target.value);
 					}}
-					disabled={
-						DimensionalityReductionEnum.PCA === analysis ||
-						DimensionalityReductionEnum.LDA === analysis
-					}
 				></Radio.Group>
 			</Card>
 			<Card title="Dimensionality reduction">
@@ -79,14 +67,8 @@ const AnalysisConfiguration = () => {
 						optionType="button"
 						buttonStyle="solid"
 						onChange={(e) => {
-							const value = e.target.value;
-							if (
-								DimensionalityReductionEnum.PCA === value ||
-								DimensionalityReductionEnum.LDA === value
-							) {
-								setNormalizationMethod(NormalizationMethodEnum.Z_SCORE);
-							}
-							setAnalysis(value);
+							setAnalysis(e.target.value);
+							setVectorsInitialized(false);
 						}}
 					></Radio.Group>
 					{DimensionalityReductionEnum.LDA === analysis ? (
@@ -105,18 +87,6 @@ const AnalysisConfiguration = () => {
 									</Select.Option>
 								))}
 							</Select>
-						</Flex>
-					) : null}
-					{DimensionalityReductionEnum.PCA === analysis ||
-					DimensionalityReductionEnum.LDA === analysis ? (
-						<Flex gap="small" align="center" justify="space-between">
-							<h3>Number of arrows:</h3>
-							<InputNumber
-								min={0}
-								max={selectedColumns.length}
-								defaultValue={numArrows}
-								onChange={onChangeNumArrows}
-							/>
 						</Flex>
 					) : null}
 				</Flex>
