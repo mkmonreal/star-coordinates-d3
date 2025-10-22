@@ -11,8 +11,11 @@ import {
 import { calculatePoints } from '../utils/data-projection';
 import { buildCartesianVector } from '../utils/vector';
 import useD3ColorScale from './useD3ColorScale';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
+	const analysis = useConfigStore((state) => state.analysis);
+	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const arrowHeadScale = unitCircleRadius / 250;
 
@@ -60,6 +63,10 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 						svg.style('cursor', 'move');
 						arrowHead.style('cursor', 'grab');
 						setVectors(currentVectors.current);
+
+						if (DimensionalityReductionEnum.NONE !== analysis) {
+							setAnalysis(DimensionalityReductionEnum.NONE);
+						}
 					})
 			)
 		);
@@ -71,6 +78,8 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 		selectedClassColumn,
 		unitCircleRadius,
 		arrowHeadScale,
+		analysis,
+		setAnalysis,
 	]);
 }
 
