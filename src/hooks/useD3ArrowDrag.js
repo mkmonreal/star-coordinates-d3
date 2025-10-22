@@ -1,17 +1,16 @@
 import { drag, select } from 'd3';
-import { matrix, multiply } from 'mathjs';
 import { useEffect, useRef } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import { enterArrows, exitArrows, updateArrows } from '../utils/d3-arrow';
-import { buildCartesianVector } from '../utils/vector';
-import useD3ColorScale from './useD3ColorScale';
-import { calculatePoints } from '../utils/data-projection';
 import {
 	enterDataCircle,
 	exitDataCircle,
 	updateDataCircle,
 } from '../utils/d3-data-circle';
+import { calculatePoints } from '../utils/data-projection';
+import { buildCartesianVector } from '../utils/vector';
+import useD3ColorScale from './useD3ColorScale';
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
