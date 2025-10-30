@@ -1,4 +1,4 @@
-import { eigs, subtract } from 'mathjs';
+import { eigs, subtract, norm, divide } from 'mathjs';
 import { createCenteredMatrix, createCovarianceMatrix } from './operations';
 
 export function pca(data) {
@@ -15,6 +15,10 @@ export function pca(data) {
 }
 
 const createPrincipalComponent = (eigen, index) => {
+	const vectorNorm = norm(eigen.vector);
+	const normalizedVector = divide(eigen.vector, vectorNorm);
+	eigen.vector = normalizedVector;
+
 	eigen.name = `PC${index + 1}`;
 	return eigen;
 };
