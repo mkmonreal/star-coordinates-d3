@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
 import { useEffect } from 'react';
+import useClassesIndexMap from '../hooks/useClassesIndexMap';
 import useDataProjection from '../hooks/useDataProjection';
 import useVectors from '../hooks/useVectors';
 import useConfigStore from '../stores/config-store';
@@ -35,10 +36,17 @@ function StarCoordinatesWrapper({ height, width }) {
 		normalizationMethod
 	);
 
+	const classesIndexMap = useClassesIndexMap(
+		analysis,
+		originalData,
+		selectedClassColumn
+	);
+
 	const [vectors, setVectors] = useVectors(
 		columnsIndexMap,
 		analysis,
-		dataMatrix
+		dataMatrix,
+		classesIndexMap
 	);
 
 	useEffect(() => {

@@ -22,6 +22,9 @@ function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 		if (!analysis) {
 			return;
 		}
+		if (DimensionalityReductionEnum.LDA === analysis && !classesIndexesMap) {
+			return;
+		}
 
 		let columnsNames = Array.from(columnsIndexMap.keys());
 

@@ -1,11 +1,13 @@
 import {
 	add,
+	divide,
 	eigs,
 	inv,
 	matrix,
 	matrixFromColumns,
 	mean,
 	multiply,
+	norm,
 	subtract,
 	transpose,
 } from 'mathjs';
@@ -110,6 +112,10 @@ function calculateIntraClassScatter(
 }
 
 function createLinearDiscriminant(eigen, index) {
+	const vectorNorm = norm(eigen.vector);
+	const normalizedVector = divide(eigen.vector, vectorNorm);
+	eigen.vector = normalizedVector;
+
 	eigen.name = `LD${index + 1}`;
 	return eigen;
 }

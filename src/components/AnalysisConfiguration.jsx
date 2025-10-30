@@ -78,7 +78,10 @@ const AnalysisConfiguration = () => {
 								style={{ width: '100%' }}
 								title="Class:"
 								value={selectedClassColumn}
-								onChange={setSelectedClassColumn}
+								onChange={(e) => {
+									setSelectedClassColumn(e);
+									setVectorsInitialized(false);
+								}}
 								placeholder="Select a column"
 							>
 								{columns?.map((column) => (
