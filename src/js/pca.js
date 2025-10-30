@@ -1,20 +1,24 @@
-import { eigs, subtract } from 'mathjs';
+import { eigs, subtract, norm, divide } from 'mathjs';
 import { createCenteredMatrix, createCovarianceMatrix } from './operations';
 
-const createPrincipalComponent = (eigen, index) => {
-	eigen.name = `PC${index + 1}`;
-	return eigen;
-};
-
-export const pca = (data) => {
+export function pca(data) {
 	const centeredMatrix = createCenteredMatrix(data);
 	const covarianceMatrix = createCovarianceMatrix(data, centeredMatrix);
 	const eigen = eigs(covarianceMatrix);
 
 	return {
 		principalComponents: eigen.eigenvectors
-			.sort((a, b) => subtract(b.value, a.value))
+			.toSorted((a, b) => subtract(b.value, a.value))
 			.map(createPrincipalComponent),
 		centeredMatrix,
 	};
+}
+
+const createPrincipalComponent = (eigen, index) => {
+	const vectorNorm = norm(eigen.vector);
+	const normalizedVector = divide(eigen.vector, vectorNorm);
+	eigen.vector = normalizedVector;
+
+	eigen.name = `PC${index + 1}`;
+	return eigen;
 };

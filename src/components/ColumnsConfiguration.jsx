@@ -13,6 +13,9 @@ const onChange = (onCheck, onUncheck, checked, column) => {
 
 function ColumnsConfiguration({ idColumn }) {
 	const setIdColumn = useConfigStore((state) => state.setIdColumn);
+	const setVectorsInitialized = useConfigStore(
+		(state) => state.setVectorsInitialized
+	);
 
 	const validColumns = useStarCoordinatesStore((state) => state.validColumns);
 	const selectedColumns = useStarCoordinatesStore(
@@ -57,14 +60,15 @@ function ColumnsConfiguration({ idColumn }) {
 					.map((column) => (
 						<Checkbox
 							key={column}
-							onChange={(e) =>
+							onChange={(e) => {
 								onChange(
 									addSelectedColumn,
 									removeSelectedColumn,
 									e.target.checked,
 									column
-								)
-							}
+								);
+								setVectorsInitialized(false);
+							}}
 							checked={true}
 						>
 							{column}
@@ -87,14 +91,15 @@ function ColumnsConfiguration({ idColumn }) {
 						.map((column) => (
 							<Checkbox
 								key={column}
-								onChange={(e) =>
+								onChange={(e) => {
 									onChange(
 										addSelectedColumn,
 										removeSelectedColumn,
 										e.target.checked,
 										column
-									)
-								}
+									);
+									setVectorsInitialized(false);
+								}}
 							>
 								{column}
 							</Checkbox>

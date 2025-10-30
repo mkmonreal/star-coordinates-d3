@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import useClassesIndexMap from '../hooks/useClassesIndexMap';
 import useDataProjection from '../hooks/useDataProjection';
-import useInitialVectors from '../hooks/useInitialVectors';
+import useVectors from '../hooks/useVectors';
 import useConfigStore from '../stores/config-store';
 import StarCoordinates from './StarCoordinates';
 
@@ -27,38 +28,30 @@ function StarCoordinatesWrapper({ height, width }) {
 
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 
-	const numArrows = useConfigStore((state) => state.numArrows);
-
 	const analysis = useConfigStore((state) => state.analysis);
 
 	const { dataMatrix, columnsIndexMap } = useDataProjection(
 		originalData,
 		selectedColumns,
-		normalizationMethod,
+		normalizationMethod
+	);
+
+	const classesIndexMap = useClassesIndexMap(
 		analysis,
-		numArrows,
+		originalData,
 		selectedClassColumn
 	);
 
-	const initialVectors = useInitialVectors(
+	const [vectors, setVectors] = useVectors(
 		columnsIndexMap,
 		analysis,
-		numArrows
+		dataMatrix,
+		classesIndexMap
 	);
-
-	const [vectors, setVectors] = useState();
-
-	const handleVectorUpdate = (newVectors) => {
-		setVectors(newVectors);
-	};
 
 	useEffect(() => {
 		setUnitCircleRadius(height > width ? width / 5 : height / 5);
 	}, [setUnitCircleRadius, width, height]);
-
-	useEffect(() => {
-		setVectors(initialVectors);
-	}, [initialVectors]);
 
 	return (
 		vectors && (
@@ -66,7 +59,7 @@ function StarCoordinatesWrapper({ height, width }) {
 				width={width}
 				height={height}
 				vectors={vectors}
-				onVectorUpdate={handleVectorUpdate}
+				onVectorUpdate={setVectors}
 				dataMatrix={dataMatrix}
 			/>
 		)
