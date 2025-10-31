@@ -54,6 +54,12 @@ export function enterArrows(enter, unitCircleRadius, arrowHeadScale) {
 					(d) =>
 						`rotate(${calculateArrowheadRotation(d.cartesian.x, d.cartesian.y, d.polar.angle, unitCircleRadius)})`
 				);
+			g.append('text')
+				.classed('arrow-text', true)
+				.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+				.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+				.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
+				.text((d) => d.label);
 		});
 }
 
@@ -85,6 +91,11 @@ export function updateArrows(update, unitCircleRadius, arrowHeadScale) {
 					getArrowbodyPath(d.cartesian.x, d.cartesian.y, unitCircleRadius)
 				)
 			);
+		arrow
+			.select('.arrow-text')
+			.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+			.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+			.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
 	});
 }
 
