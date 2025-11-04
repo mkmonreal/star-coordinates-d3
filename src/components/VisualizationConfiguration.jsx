@@ -12,17 +12,25 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { Card, ColorPicker, Flex, Select } from 'antd';
+import { Card, ColorPicker, Flex, Select, Radio } from 'antd';
 import ColorsetEnum from '../enums/colorset-enum';
 import useD3ColorScale from '../hooks/useD3ColorScale';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 
 const DEFAULT_COLOR = '#FFA500';
 
 const colorsetOptions = Object.values(ColorsetEnum).map((colorset) => ({
 	label: colorset.name,
 	value: colorset,
+}));
+
+const vectorVisualizationOptions = Object.values(
+	VectorNameVisualizationEnum
+).map((vectorVisualization) => ({
+	label: vectorVisualization.name,
+	value: vectorVisualization.value,
 }));
 
 function VisualizationConfiguration() {
@@ -35,6 +43,13 @@ function VisualizationConfiguration() {
 	);
 
 	const setColorset = useConfigStore((state) => state.setColorset);
+	const vectorVisualization = useConfigStore(
+		(state) => state.vectorVisualization
+	);
+
+	const setVectorVisualization = useConfigStore(
+		(state) => state.setVectorVisualization
+	);
 
 	const { classesSet, selectColor } = useD3ColorScale(selectedClassColumn);
 
@@ -99,6 +114,25 @@ function VisualizationConfiguration() {
 								))}
 						</Flex>
 					)}
+				</Flex>
+			</Card>
+			<Card title="Vectors configuration">
+				<Flex vertical>
+					<span>Show vectors names</span>
+					<Radio.Group
+						block
+						value={vectorVisualization.value}
+						options={vectorVisualizationOptions}
+						defaultValue={vectorVisualizationOptions[0].value}
+						optionType="button"
+						buttonStyle="solid"
+						onChange={(e) => {
+							const newVectorVisualization = vectorVisualizationOptions.find(
+								(option) => option.value === e.target.value
+							);
+							setVectorVisualization(newVectorVisualization);
+						}}
+					></Radio.Group>
 				</Flex>
 			</Card>
 		</Flex>

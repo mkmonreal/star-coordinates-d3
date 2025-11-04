@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 import { line } from 'd3';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 import {
 	calculateArrowheadRotation,
 	getArrowbodyPath,
@@ -54,12 +55,6 @@ export function enterArrows(enter, unitCircleRadius, arrowHeadScale) {
 					(d) =>
 						`rotate(${calculateArrowheadRotation(d.cartesian.x, d.cartesian.y, d.polar.angle, unitCircleRadius)})`
 				);
-			g.append('text')
-				.classed('arrow-text', true)
-				.attr('x', (d) => d.cartesian.x * unitCircleRadius)
-				.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
-				.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
-				.text((d) => d.label);
 		});
 }
 
@@ -91,14 +86,60 @@ export function updateArrows(update, unitCircleRadius, arrowHeadScale) {
 					getArrowbodyPath(d.cartesian.x, d.cartesian.y, unitCircleRadius)
 				)
 			);
-		arrow
-			.select('.arrow-text')
-			.attr('x', (d) => d.cartesian.x * unitCircleRadius)
-			.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
-			.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
 	});
 }
 
 export function exitArrows(exit) {
 	exit.remove();
+}
+
+export function drawArrowLabel(
+	svgSelection,
+	vectors,
+	unitCircleRadius,
+	vectorVisualization
+) {
+	if (VectorNameVisualizationEnum.NONE.value === vectorVisualization.value) {
+		svgSelection.selectAll('.arrow-text').remove();
+	}
+
+	if (VectorNameVisualizationEnum.ALWAYS.value === vectorVisualization.value) {
+		svgSelection
+			.select('.arrows')
+			.select('.arrow')
+			.selectAll('.arrow-text')
+			.data(vectors, (vector) => vector.label)
+			.join(
+				(enter) => {
+					enter
+						.append('text')
+						.classed('arrow-text', true)
+						.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+						.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+						.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
+						.text((d) => d.label);
+				},
+				(update) => {
+					update
+						.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+						.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+						.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
+				},
+				(exit) => {
+					exit.remove();
+				}
+			);
+	}
+	if (VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value) {
+		svgSelection.selectAll('.arrow-text').remove();
+
+		svgSelection
+			.select('.arrows')
+			.selectAll('.arrow')
+			.select('.arrow-head')
+			.on('mouseover', (e, i) => {
+				console.log(e);
+				console.log(i);
+			});
+	}
 }
