@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { line } from 'd3';
+import { line, select } from 'd3';
 import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 import {
 	calculateArrowheadRotation,
@@ -111,35 +111,59 @@ export function drawArrowLabel(
 			.data(vectors, (vector) => vector.label)
 			.join(
 				(enter) => {
-					enter
-						.append('text')
-						.classed('arrow-text', true)
-						.attr('x', (d) => d.cartesian.x * unitCircleRadius)
-						.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
-						.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
-						.text((d) => d.label);
+					appendArrowText(enter, unitCircleRadius);
 				},
 				(update) => {
-					update
-						.attr('x', (d) => d.cartesian.x * unitCircleRadius)
-						.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
-						.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
+					updateArrowTextPosition(update, unitCircleRadius);
 				},
 				(exit) => {
 					exit.remove();
 				}
 			);
 	}
-	if (VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value) {
-		svgSelection.selectAll('.arrow-text').remove();
 
-		svgSelection
-			.select('.arrows')
-			.selectAll('.arrow')
-			.select('.arrow-head')
-			.on('mouseover', (e, i) => {
-				console.log(e);
-				console.log(i);
-			});
+	if (VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value) {
+		const currentCursor = svgSelection.style('cursor');
+		if ('grabbing' !== currentCursor) {
+			svgSelection.selectAll('.arrow-text').remove();
+		}
+
+		const arrow = svgSelection.select('.arrows').selectAll('.arrow');
+		if (0 !== arrow.select('.arrow-text').nodes().length) {
+			updateArrowTextPosition(arrow.select('.arrow-text'), unitCircleRadius);
+		}
+		arrow.select('.arrow-head').on('mouseover', (event) => {
+			const currentArrow = select(event.currentTarget.parentNode);
+			const currentArrowText = currentArrow.select('.arrow-text');
+			if (!currentArrowText.node()) {
+				appendArrowText(currentArrow, unitCircleRadius);
+			}
+		});
+
+		arrow.select('.arrow-head').on('mouseout', () => {
+			const currentCursor = svgSelection.style('cursor');
+			if ('grabbing' !== currentCursor) {
+				svgSelection.selectAll('.arrow-text').remove();
+			}
+		});
 	}
+}
+
+function appendArrowText(selection, unitCircleRadius) {
+	selection
+		.append('text')
+		.classed('arrow-text', true)
+		.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+		.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+		.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
+		.text((d) => d.label);
+	return selection;
+}
+
+function updateArrowTextPosition(selection, unitCircleRadius) {
+	selection
+		.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+		.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+		.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
+	return selection;
 }
