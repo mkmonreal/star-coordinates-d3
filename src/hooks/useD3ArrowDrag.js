@@ -16,7 +16,12 @@ import { drag, select } from 'd3';
 import { useEffect, useRef } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import { enterArrows, exitArrows, updateArrows } from '../utils/d3-arrow';
+import {
+	drawArrowLabel,
+	enterArrows,
+	exitArrows,
+	updateArrows,
+} from '../utils/d3-arrow';
 import {
 	enterDataCircle,
 	exitDataCircle,
@@ -28,6 +33,9 @@ import useD3ColorScale from './useD3ColorScale';
 import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
+	const vectorVisualization = useConfigStore(
+		(state) => state.vectorVisualization
+	);
 	const analysis = useConfigStore((state) => state.analysis);
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
@@ -71,6 +79,7 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 							selectedClassColumn,
 							unitCircleRadius,
 							arrowHeadScale,
+							vectorVisualization,
 						});
 					})
 					.on('end', () => {
@@ -94,6 +103,7 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 		arrowHeadScale,
 		analysis,
 		setAnalysis,
+		vectorVisualization,
 	]);
 }
 
@@ -108,6 +118,7 @@ function dragHandler({
 	selectedClassColumn,
 	unitCircleRadius,
 	arrowHeadScale,
+	vectorVisualization,
 }) {
 	const prevVector = currentVectors.current.find(
 		(vector) => e.subject.id === vector.id
@@ -161,6 +172,13 @@ function dragHandler({
 			},
 			exitDataCircle
 		);
+
+	drawArrowLabel(
+		svg,
+		currentVectors.current,
+		unitCircleRadius,
+		vectorVisualization
+	);
 }
 
 export default useD3ArrowDrag;

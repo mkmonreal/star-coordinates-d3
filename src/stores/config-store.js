@@ -17,6 +17,7 @@ import { orange, volcano } from '@ant-design/colors';
 import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import ColorsetEnum from '../enums/colorset-enum';
 import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 
 const useConfigStore = create((set) => ({
 	idColumn: '',
@@ -30,6 +31,7 @@ const useConfigStore = create((set) => ({
 	normalizationMethod: NormalizationMethodEnum.MIN_MAX,
 	analysis: DimensionalityReductionEnum.NONE,
 	vectorsInitialized: false,
+	vectorVisualization: VectorNameVisualizationEnum.ALWAYS,
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
 	setSelectedVectors: (selectedVectors) => set({ selectedVectors }),
@@ -41,6 +43,7 @@ const useConfigStore = create((set) => ({
 	setNormalizationMethod: (normalizationMethod) => set({ normalizationMethod }),
 	setAnalysis: (analysis) => set({ analysis }),
 	setVectorsInitialized: (vectorsInitialized) => set({ vectorsInitialized }),
+	setVectorVisualization: (vectorVisualization) => set({ vectorVisualization }),
 }));
 
 export default useConfigStore;

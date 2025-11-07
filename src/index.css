@@ -34,5 +34,10 @@ html {
 		& .arrow-head {
 			cursor: grab;
 		}
+
+		& .arrow-text {
+			text-anchor: middle;
+			dominant-baseline: middle;
+		}
 	}
 }
