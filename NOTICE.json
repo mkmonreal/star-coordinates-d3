@@ -5,45 +5,45 @@
     "publisher": "afc163",
     "email": "afc163@gmail.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@ant-design/colors",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@ant-design/colors/LICENSE"
+    "licenseFile": "node_modules/@ant-design/colors/LICENSE"
   },
   "@ant-design/icons@5.6.1": {
     "licenses": "MIT",
     "repository": "https://github.com/ant-design/ant-design-icons/tree/master/packages/icons-react",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@ant-design/icons",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@ant-design/icons/LICENSE"
+    "licenseFile": "node_modules/@ant-design/icons/LICENSE"
   },
   "@eslint/compat@1.2.7": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/eslint/rewrite",
     "publisher": "Nicholas C. Zakas",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/compat",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/compat/LICENSE"
+    "licenseFile": "node_modules/@eslint/compat/LICENSE"
   },
   "@eslint/eslintrc@3.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/eslint/eslintrc",
     "publisher": "Nicholas C. Zakas",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/eslintrc",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/eslintrc/LICENSE"
+    "licenseFile": "node_modules/@eslint/eslintrc/LICENSE"
   },
   "@eslint/js@9.21.0": {
     "licenses": "MIT",
     "repository": "https://github.com/eslint/eslint",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/js",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@eslint/js/LICENSE"
+    "licenseFile": "node_modules/@eslint/js/LICENSE"
   },
   "@types/react-dom@19.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@types/react-dom",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@types/react-dom/LICENSE"
+    "licenseFile": "node_modules/@types/react-dom/LICENSE"
   },
   "@types/react@19.0.10": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@types/react",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@types/react/LICENSE"
+    "licenseFile": "node_modules/@types/react/LICENSE"
   },
   "@vitejs/plugin-react-swc@3.8.0": {
     "licenses": "MIT",
@@ -51,13 +51,13 @@
     "publisher": "Arnaud Barré",
     "url": "https://github.com/ArnaudBarre",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@vitejs/plugin-react-swc",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/@vitejs/plugin-react-swc/LICENSE"
+    "licenseFile": "node_modules/@vitejs/plugin-react-swc/LICENSE"
   },
   "antd@5.24.3": {
     "licenses": "MIT",
     "repository": "https://github.com/ant-design/ant-design",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/antd",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/antd/LICENSE"
+    "licenseFile": "node_modules/antd/LICENSE"
   },
   "d3@7.9.0": {
     "licenses": "ISC",
@@ -65,14 +65,14 @@
     "publisher": "Mike Bostock",
     "url": "https://bost.ocks.org/mike",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/d3",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/d3/LICENSE"
+    "licenseFile": "node_modules/d3/LICENSE"
   },
   "eslint-config-prettier@10.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/prettier/eslint-config-prettier",
     "publisher": "Simon Lydell",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-config-prettier",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-config-prettier/LICENSE"
+    "licenseFile": "node_modules/eslint-config-prettier/LICENSE"
   },
   "eslint-plugin-import@2.31.0": {
     "licenses": "MIT",
@@ -80,27 +80,27 @@
     "publisher": "Ben Mosher",
     "email": "me@benmosher.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-import",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-import/LICENSE"
+    "licenseFile": "node_modules/eslint-plugin-import/LICENSE"
   },
   "eslint-plugin-jsx-a11y@6.10.2": {
     "licenses": "MIT",
     "repository": "https://github.com/jsx-eslint/eslint-plugin-jsx-a11y",
     "publisher": "Ethan Cohen",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-jsx-a11y",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-jsx-a11y/LICENSE.md"
+    "licenseFile": "node_modules/eslint-plugin-jsx-a11y/LICENSE.md"
   },
   "eslint-plugin-prettier@5.2.3": {
     "licenses": "MIT",
     "repository": "https://github.com/prettier/eslint-plugin-prettier",
     "publisher": "Teddy Katz",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-prettier",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-prettier/LICENSE.md"
+    "licenseFile": "node_modules/eslint-plugin-prettier/LICENSE.md"
   },
   "eslint-plugin-react-hooks@5.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react-hooks",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react-hooks/LICENSE"
+    "licenseFile": "node_modules/eslint-plugin-react-hooks/LICENSE"
   },
   "eslint-plugin-react-refresh@0.4.19": {
     "licenses": "MIT",
@@ -108,7 +108,7 @@
     "publisher": "Arnaud Barré",
     "url": "https://github.com/ArnaudBarre",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react-refresh",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react-refresh/LICENSE"
+    "licenseFile": "node_modules/eslint-plugin-react-refresh/LICENSE"
   },
   "eslint-plugin-react@7.37.4": {
     "licenses": "MIT",
@@ -116,14 +116,14 @@
     "publisher": "Yannick Croissant",
     "email": "yannick.croissant+npm@gmail.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-react/LICENSE"
+    "licenseFile": "node_modules/eslint-plugin-react/LICENSE"
   },
   "eslint-plugin-unused-imports@4.1.4": {
     "licenses": "MIT",
     "repository": "https://github.com/sweepline/eslint-plugin-unused-imports",
     "publisher": "Mikkel Holmer Pedersen",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-unused-imports",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint-plugin-unused-imports/LICENSE"
+    "licenseFile": "node_modules/eslint-plugin-unused-imports/LICENSE"
   },
   "eslint@9.21.0": {
     "licenses": "MIT",
@@ -131,7 +131,7 @@
     "publisher": "Nicholas C. Zakas",
     "email": "nicholas+npm@nczconsulting.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/eslint/LICENSE"
+    "licenseFile": "node_modules/eslint/LICENSE"
   },
   "globals@16.0.0": {
     "licenses": "MIT",
@@ -140,13 +140,13 @@
     "email": "sindresorhus@gmail.com",
     "url": "https://sindresorhus.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/globals",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/globals/license"
+    "licenseFile": "node_modules/globals/license"
   },
   "jsdom@26.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/jsdom",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/jsdom",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/jsdom/LICENSE.txt"
+    "licenseFile": "node_modules/jsdom/LICENSE.txt"
   },
   "mathjs@14.3.1": {
     "licenses": "Apache-2.0",
@@ -155,8 +155,8 @@
     "email": "wjosdejong@gmail.com",
     "url": "https://github.com/josdejong",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/mathjs",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/mathjs/LICENSE",
-    "noticeFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/mathjs/NOTICE"
+    "licenseFile": "node_modules/mathjs/LICENSE",
+    "noticeFile": "node_modules/mathjs/NOTICE"
   },
   "prettier-eslint@16.3.0": {
     "licenses": "MIT",
@@ -165,46 +165,46 @@
     "email": "kent@doddsfamily.us",
     "url": "http://kentcdodds.com/",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prettier-eslint",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prettier-eslint/LICENSE"
+    "licenseFile": "node_modules/prettier-eslint/LICENSE"
   },
   "prettier@3.5.3": {
     "licenses": "MIT",
     "repository": "https://github.com/prettier/prettier",
     "publisher": "James Long",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prettier",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prettier/LICENSE"
+    "licenseFile": "node_modules/prettier/LICENSE"
   },
   "prop-types@15.8.1": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/prop-types",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prop-types",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/prop-types/LICENSE"
+    "licenseFile": "node_modules/prop-types/LICENSE"
   },
   "react-dom@18.3.1": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/react-dom",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/react-dom/LICENSE"
+    "licenseFile": "node_modules/react-dom/LICENSE"
   },
   "react@18.3.1": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/react",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/react/LICENSE"
+    "licenseFile": "node_modules/react/LICENSE"
   },
   "star-coordinates-d3@1.0.0": {
     "licenses": "Apache-2.0",
     "publisher": "mkmonreal",
     "path": "/home/mkmonreal/Git/star-coordinates-d3",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/LICENSE",
-    "noticeFile": "/home/mkmonreal/Git/star-coordinates-d3/NOTICE.md"
+    "licenseFile": "LICENSE",
+    "noticeFile": "NOTICE.json"
   },
   "vite@6.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/vite",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/vite/LICENSE.md"
+    "licenseFile": "node_modules/vite/LICENSE.md"
   },
   "vitest@3.0.9": {
     "licenses": "MIT",
@@ -212,14 +212,14 @@
     "publisher": "Anthony Fu",
     "email": "anthonyfu117@hotmail.com",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/vitest",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/vitest/LICENSE.md"
+    "licenseFile": "node_modules/vitest/LICENSE.md"
   },
   "zustand@5.0.3": {
     "licenses": "MIT",
     "repository": "https://github.com/pmndrs/zustand",
     "publisher": "Paul Henschel",
     "path": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/zustand",
-    "licenseFile": "/home/mkmonreal/Git/star-coordinates-d3/node_modules/zustand/LICENSE"
+    "licenseFile": "node_modules/zustand/LICENSE"
   }
 }
 
