@@ -14,7 +14,11 @@
 
 import './App.css';
 
-import { FileAddFilled, SettingFilled } from '@ant-design/icons';
+import {
+	FileAddFilled,
+	GithubOutlined,
+	SettingFilled,
+} from '@ant-design/icons';
 import { Drawer, Empty, Flex, FloatButton } from 'antd';
 import { useRef, useState } from 'react';
 import Configuration from './components/Configuration';
@@ -122,6 +126,11 @@ function App() {
 					onClick={() => {
 						inputFileRef.current?.click();
 					}}
+				/>
+				<FloatButton
+					icon={<GithubOutlined />}
+					href="https://github.com/mkmonreal/star-coordinates-d3"
+					target="_blank"
 				/>
 				<FloatButton
 					icon={<SettingFilled />}
