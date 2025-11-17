@@ -46,9 +46,6 @@ const AnalysisConfiguration = () => {
 	);
 
 	const columns = useStarCoordinatesStore((state) => state.columns);
-	const selectedColumns = useStarCoordinatesStore(
-		(state) => state.selectedColumns
-	);
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
 	);

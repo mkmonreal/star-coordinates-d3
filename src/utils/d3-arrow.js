@@ -12,7 +12,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { line } from 'd3';
+import { line, select } from 'd3';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 import {
 	calculateArrowheadRotation,
 	getArrowbodyPath,
@@ -90,4 +91,65 @@ export function updateArrows(update, unitCircleRadius, arrowHeadScale) {
 
 export function exitArrows(exit) {
 	exit.remove();
+}
+
+export function drawArrowLabel(
+	svgSelection,
+	vectors,
+	unitCircleRadius,
+	vectorVisualization
+) {
+	if (VectorNameVisualizationEnum.NONE.value === vectorVisualization.value) {
+		svgSelection.selectAll('.arrow-text').remove();
+	}
+
+	if (VectorNameVisualizationEnum.ALWAYS.value === vectorVisualization.value) {
+		svgSelection
+			.select('.arrows')
+			.select('.arrow')
+			.selectAll('.arrow-text')
+			.data(vectors, (vector) => vector.label)
+			.join(
+				(enter) => {
+					appendArrowText(enter, unitCircleRadius);
+				},
+				(update) => {
+					updateArrowTextPosition(update, unitCircleRadius);
+				},
+				(exit) => {
+					exit.remove();
+				}
+			);
+	}
+
+	if (VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value) {
+		const currentCursor = svgSelection.style('cursor');
+		if ('grabbing' !== currentCursor) {
+			svgSelection.selectAll('.arrow-text').remove();
+		}
+
+		const arrow = svgSelection.select('.arrows').selectAll('.arrow');
+		if (0 !== arrow.select('.arrow-text').nodes().length) {
+			updateArrowTextPosition(arrow.select('.arrow-text'), unitCircleRadius);
+		}
+	}
+}
+
+export function appendArrowText(selection, unitCircleRadius) {
+	selection
+		.append('text')
+		.classed('arrow-text', true)
+		.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+		.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+		.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12))
+		.text((d) => d.label);
+	return selection;
+}
+
+function updateArrowTextPosition(selection, unitCircleRadius) {
+	selection
+		.attr('x', (d) => d.cartesian.x * unitCircleRadius)
+		.attr('y', (d) => -d.cartesian.y * unitCircleRadius)
+		.attr('dy', (d) => (0 > d.cartesian.y ? 12 : -12));
+	return selection;
 }
