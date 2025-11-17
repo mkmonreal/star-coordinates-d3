@@ -132,24 +132,10 @@ export function drawArrowLabel(
 		if (0 !== arrow.select('.arrow-text').nodes().length) {
 			updateArrowTextPosition(arrow.select('.arrow-text'), unitCircleRadius);
 		}
-		arrow.select('.arrow-head').on('mouseover', (event) => {
-			const currentArrow = select(event.currentTarget.parentNode);
-			const currentArrowText = currentArrow.select('.arrow-text');
-			if (!currentArrowText.node()) {
-				appendArrowText(currentArrow, unitCircleRadius);
-			}
-		});
-
-		arrow.select('.arrow-head').on('mouseout', () => {
-			const currentCursor = svgSelection.style('cursor');
-			if ('grabbing' !== currentCursor) {
-				svgSelection.selectAll('.arrow-text').remove();
-			}
-		});
 	}
 }
 
-function appendArrowText(selection, unitCircleRadius) {
+export function appendArrowText(selection, unitCircleRadius) {
 	selection
 		.append('text')
 		.classed('arrow-text', true)

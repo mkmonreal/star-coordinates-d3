@@ -17,6 +17,7 @@ import { useEffect, useRef } from 'react';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import {
+	appendArrowText,
 	drawArrowLabel,
 	enterArrows,
 	exitArrows,
@@ -31,6 +32,7 @@ import { calculatePoints } from '../utils/data-projection';
 import { buildCartesianVector } from '../utils/vector';
 import useD3ColorScale from './useD3ColorScale';
 import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 
 function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const vectorVisualization = useConfigStore(
@@ -60,7 +62,7 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 
 	useEffect(() => {
 		const svg = select(svgRef.current);
-		svg.selectAll('.arrow-head').call((arrowHead) =>
+		svg.selectAll('.arrow-head').call((arrowHead) => {
 			arrowHead.call(
 				drag()
 					.on('start', () => {
@@ -91,8 +93,26 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 							setAnalysis(DimensionalityReductionEnum.NONE);
 						}
 					})
-			)
-		);
+			);
+			if (
+				VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value
+			) {
+				arrowHead.on('mouseover', (event) => {
+					const currentArrow = select(event.currentTarget.parentNode);
+					const currentArrowText = currentArrow.select('.arrow-text');
+					if (!currentArrowText.node()) {
+						appendArrowText(currentArrow, unitCircleRadius);
+					}
+				});
+
+				arrowHead.on('mouseout', () => {
+					const currentCursor = svg.style('cursor');
+					if ('grabbing' !== currentCursor) {
+						svg.selectAll('.arrow-text').remove();
+					}
+				});
+			}
+		});
 	}, [
 		setVectors,
 		selectColor,
