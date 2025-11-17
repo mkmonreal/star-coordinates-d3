@@ -94,6 +94,9 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 						}
 					})
 			);
+
+			arrowHead.on('mouseover', null);
+			arrowHead.on('mouseout', null);
 			if (
 				VectorNameVisualizationEnum.HOVER.value === vectorVisualization.value
 			) {
