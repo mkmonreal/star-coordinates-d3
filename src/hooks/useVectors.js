@@ -12,12 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
 import { lda } from '../js/lda';
 import { pca } from '../js/pca';
-import { buildCartesianVector, buildPolarVector } from '../utils/vector';
 import useConfigStore from '../stores/config-store';
+import useStarCoordinatesStore from '../stores/star-coorditantes-store';
+import { buildCartesianVector, buildPolarVector } from '../utils/vector';
 
 function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 	const vectorsInitialized = useConfigStore(
@@ -27,7 +28,8 @@ function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 		(state) => state.setVectorsInitialized
 	);
 
-	const [vectors, setVectors] = useState();
+	const vectors = useStarCoordinatesStore((state) => state.vectors);
+	const setVectors = useStarCoordinatesStore((state) => state.setVectors);
 
 	const initialVectors = useMemo(() => {
 		if (!columnsIndexMap) {
@@ -83,7 +85,7 @@ function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 			setVectors(initialVectors);
 			setVectorsInitialized(true);
 		}
-	}, [initialVectors, vectorsInitialized, setVectorsInitialized]);
+	}, [initialVectors, vectorsInitialized, setVectorsInitialized, setVectors]);
 
 	return [vectors, setVectors];
 }

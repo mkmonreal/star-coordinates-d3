@@ -15,6 +15,7 @@
 import { create } from 'zustand';
 
 const useStarCoordinatesStore = create((set, get) => ({
+	vectors: [],
 	columns: [],
 	validColumns: [],
 	selectedColumns: [],
@@ -22,6 +23,7 @@ const useStarCoordinatesStore = create((set, get) => ({
 	selectedClassColumn: null,
 	classes: new Set(),
 	eigenDecomposition: [],
+	setVectors: (vectors) => set({ vectors }),
 	setColumns: (columns) => set({ columns }),
 	setValidColumns: (validColumns) => set({ validColumns }),
 	setSelectedColumns: (selectedColumns) => set({ selectedColumns }),

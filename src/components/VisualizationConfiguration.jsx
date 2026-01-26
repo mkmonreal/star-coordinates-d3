@@ -12,12 +12,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { Card, ColorPicker, Flex, Select, Radio } from 'antd';
+import { Card, ColorPicker, Flex, InputNumber, Radio, Select } from 'antd';
+import { useState } from 'react';
 import ColorsetEnum from '../enums/colorset-enum';
+import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
+import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
+import VectorRepresentationEnum from '../enums/vetor-representation-enum';
 import useD3ColorScale from '../hooks/useD3ColorScale';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
-import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
+import { buildCartesianVector, buildPolarVector } from '../utils/vector';
 
 const DEFAULT_COLOR = '#FFA500';
 
@@ -33,7 +37,17 @@ const vectorVisualizationOptions = Object.values(
 	value: vectorVisualization.value,
 }));
 
+const vectorRepresentationOptions = Object.values(VectorRepresentationEnum).map(
+	(vectorVisualizationOption) => ({
+		label: vectorVisualizationOption,
+		value: vectorVisualizationOption,
+	})
+);
+
 function VisualizationConfiguration() {
+	const vectors = useStarCoordinatesStore((state) => state.vectors);
+	const setVectors = useStarCoordinatesStore((state) => state.setVectors);
+
 	const columns = useStarCoordinatesStore((state) => state.columns);
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
@@ -52,6 +66,13 @@ function VisualizationConfiguration() {
 	);
 
 	const { classesSet, selectColor } = useD3ColorScale(selectedClassColumn);
+
+	const [vectorRepresentation, setVectorRepresentation] = useState(
+		VectorRepresentationEnum.CARTESIAN
+	);
+
+	const analysis = useConfigStore((state) => state.analysis);
+	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 
 	return (
 		<Flex vertical gap="middle">
@@ -117,22 +138,188 @@ function VisualizationConfiguration() {
 				</Flex>
 			</Card>
 			<Card title="Vectors configuration">
-				<Flex vertical>
-					<span>Show vectors names</span>
-					<Radio.Group
-						block
-						value={vectorVisualization.value}
-						options={vectorVisualizationOptions}
-						defaultValue={vectorVisualizationOptions[0].value}
-						optionType="button"
-						buttonStyle="solid"
-						onChange={(e) => {
-							const newVectorVisualization = vectorVisualizationOptions.find(
-								(option) => option.value === e.target.value
-							);
-							setVectorVisualization(newVectorVisualization);
-						}}
-					></Radio.Group>
+				<Flex vertical gap={16}>
+					<Card type="inner" size="small" title="Show vectors names">
+						<Radio.Group
+							block
+							value={vectorVisualization.value}
+							options={vectorVisualizationOptions}
+							defaultValue={vectorVisualizationOptions[0].value}
+							optionType="button"
+							buttonStyle="solid"
+							onChange={(e) => {
+								const newVectorVisualization = vectorVisualizationOptions.find(
+									(option) => option.value === e.target.value
+								);
+								setVectorVisualization(newVectorVisualization);
+							}}
+						></Radio.Group>
+					</Card>
+					<Card type="inner" size="small" title="Vectors modification">
+						<Flex vertical gap={12}>
+							<Radio.Group
+								block
+								value={vectorRepresentation}
+								options={vectorRepresentationOptions}
+								defaultValue={VectorRepresentationEnum.CARTESIAN}
+								optionType="button"
+								buttonStyle="solid"
+								onChange={(e) => {
+									const newVectorRepresentationOption =
+										vectorRepresentationOptions.find(
+											(option) => e.target.value === option.value
+										);
+									console.log(newVectorRepresentationOption);
+									setVectorRepresentation(newVectorRepresentationOption.value);
+								}}
+							></Radio.Group>
+							<Flex vertical gap={8}>
+								{vectors
+									? vectors.map((vector) => (
+											<Card
+												key={vector.id}
+												title={vector.label}
+												type="inner"
+												size="small"
+											>
+												{VectorRepresentationEnum.CARTESIAN ===
+												vectorRepresentation ? (
+													<Flex justify="space-around">
+														<Flex align="center">
+															<span>x:</span>
+															<InputNumber
+																step="0.01"
+																value={vector.cartesian.x}
+																onChange={(e) => {
+																	if (!e) {
+																		return;
+																	}
+
+																	const newVector = buildCartesianVector(
+																		e,
+																		vector.cartesian.y,
+																		vector.label,
+																		vector.id
+																	);
+																	const newVectors = vectors.map((vector) =>
+																		newVector.id === vector.id
+																			? newVector
+																			: vector
+																	);
+																	setVectors(newVectors);
+
+																	if (
+																		DimensionalityReductionEnum.NONE !==
+																		analysis
+																	) {
+																		setAnalysis(
+																			DimensionalityReductionEnum.NONE
+																		);
+																	}
+																}}
+															/>
+														</Flex>
+														<Flex align="center">
+															<span>y:</span>
+															<InputNumber
+																step="0.01"
+																value={vector.cartesian.y}
+																onChange={(e) => {
+																	if (!e) {
+																		return;
+																	}
+
+																	const newVector = buildCartesianVector(
+																		vector.cartesian.x,
+																		e,
+																		vector.label,
+																		vector.id
+																	);
+																	const newVectors = vectors.map((vector) =>
+																		newVector.id === vector.id
+																			? newVector
+																			: vector
+																	);
+																	setVectors(newVectors);
+																	if (
+																		DimensionalityReductionEnum.NONE !==
+																		analysis
+																	) {
+																		setAnalysis(
+																			DimensionalityReductionEnum.NONE
+																		);
+																	}
+																}}
+															/>
+														</Flex>
+													</Flex>
+												) : null}
+												{VectorRepresentationEnum.POLAR ===
+												vectorRepresentation ? (
+													<Flex>
+														<span>Module:</span>
+														<InputNumber
+															step="0.01"
+															value={vector.polar.module}
+															onChange={(e) => {
+																if (!e) {
+																	return;
+																}
+
+																const newVector = buildPolarVector(
+																	e,
+																	vector.polar.angle,
+																	vector.label,
+																	vector.id
+																);
+																const newVectors = vectors.map((vector) =>
+																	newVector.id === vector.id
+																		? newVector
+																		: vector
+																);
+																setVectors(newVectors);
+																if (
+																	DimensionalityReductionEnum.NONE !== analysis
+																) {
+																	setAnalysis(DimensionalityReductionEnum.NONE);
+																}
+															}}
+														/>
+														<span>Angle:</span>
+														<InputNumber
+															value={vector.polar.angle}
+															onChange={(e) => {
+																if (!e) {
+																	return;
+																}
+
+																const newVector = buildPolarVector(
+																	vector.polar.module,
+																	e,
+																	vector.label,
+																	vector.id
+																);
+																const newVectors = vectors.map((vector) =>
+																	newVector.id === vector.id
+																		? newVector
+																		: vector
+																);
+																setVectors(newVectors);
+																if (
+																	DimensionalityReductionEnum.NONE !== analysis
+																) {
+																	setAnalysis(DimensionalityReductionEnum.NONE);
+																}
+															}}
+														/>
+													</Flex>
+												) : null}
+											</Card>
+										))
+									: null}
+							</Flex>
+						</Flex>
+					</Card>
 				</Flex>
 			</Card>
 		</Flex>
