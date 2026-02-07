@@ -12,8 +12,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+import { drag, select } from 'd3';
 import { useEffect, useRef } from 'react';
-import { select, drag } from 'd3';
 import useConfigStore from '../stores/config-store';
 
 function useD3SVGSetup(width, height) {
@@ -67,7 +67,7 @@ function useD3SVGSetup(width, height) {
 		};
 	}, [width, height, unitCircleRadius]);
 
-	return svgRef;
+	return { svgRef, currentViewBox };
 }
 
 export default useD3SVGSetup;
