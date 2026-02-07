@@ -14,10 +14,12 @@
 
 import PropTypes from 'prop-types';
 import { useMemo } from 'react';
+import useAutomaticMovement from '../hooks/useAutomaticMovement';
 import useD3ArrowDrag from '../hooks/useD3ArrowDrag';
 import useD3ArrowRender from '../hooks/useD3ArrowRender';
 import useD3DataCircleRender from '../hooks/useD3DataCircleRender';
 import useD3SVGSetup from '../hooks/useD3SVGSetup';
+import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import { calculatePoints } from '../utils/data-projection';
 
@@ -28,9 +30,11 @@ function StarCoordinates({
 	onVectorUpdate,
 	dataMatrix,
 }) {
-	const svgRef = useD3SVGSetup(width, height);
+	const { svgRef, currentViewBox } = useD3SVGSetup(width, height);
 
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
+
+	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 
 	const points = useMemo(() => {
 		return calculatePoints(vectors, dataMatrix, originalData);
@@ -39,6 +43,14 @@ function StarCoordinates({
 	useD3ArrowRender(svgRef, vectors);
 	useD3DataCircleRender(svgRef, points);
 	useD3ArrowDrag(onVectorUpdate, svgRef, points, vectors, dataMatrix);
+
+	useAutomaticMovement(
+		svgRef,
+		currentViewBox,
+		unitCircleRadius,
+		vectors,
+		points
+	);
 
 	return <svg className="star-coordinates" ref={svgRef}></svg>;
 }
