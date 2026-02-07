@@ -169,7 +169,6 @@ function VisualizationConfiguration() {
 										vectorRepresentationOptions.find(
 											(option) => e.target.value === option.value
 										);
-									console.log(newVectorRepresentationOption);
 									setVectorRepresentation(newVectorRepresentationOption.value);
 								}}
 							></Radio.Group>
