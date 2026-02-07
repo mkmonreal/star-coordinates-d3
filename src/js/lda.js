@@ -24,6 +24,7 @@ import {
 	norm,
 	subtract,
 	transpose,
+	det,
 } from 'mathjs';
 import { initializeMatrixArrayWithValues } from '../utils/array';
 
@@ -95,6 +96,9 @@ export function lda(dataMatrix, classesIndexesMap) {
 		interClassScatter = add(scatterMatrix, interClassScatter);
 	}
 
+	if (!det(intraClassScatter)) {
+		return;
+	}
 	const eigen = eigs(multiply(inv(intraClassScatter), interClassScatter));
 
 	return {
