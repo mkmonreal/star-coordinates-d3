@@ -25,9 +25,13 @@ import useD3ColorScale from './useD3ColorScale';
 
 function useD3DataCircleRender(svgRef, points) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
+	const opacity = useConfigStore((state) => state.opacity);
+	const radius = useConfigStore((state) => state.radius);
+
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
 	);
+
 	const { selectColor } = useD3ColorScale(selectedClassColumn);
 
 	useEffect(() => {
@@ -46,6 +50,8 @@ function useD3DataCircleRender(svgRef, points) {
 					enterDataCircle(
 						enter,
 						unitCircleRadius,
+						radius,
+						opacity,
 						selectColor,
 						selectedClassColumn
 					),
