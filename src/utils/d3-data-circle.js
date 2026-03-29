@@ -15,6 +15,8 @@
 export function enterDataCircle(
 	enter,
 	unitCircleRadius,
+	radius,
+	opacity,
 	selectColor,
 	selectedClassColumn
 ) {
@@ -23,7 +25,7 @@ export function enterDataCircle(
 		.classed('data-circle', true)
 		.attr('cx', (d) => d.x * unitCircleRadius)
 		.attr('cy', (d) => -d.y * unitCircleRadius)
-		.attr('r', 4)
+		.attr('r', radius)
 		.attr('stroke', 'black')
 		.attr('fill', (d) => {
 			if (!selectColor) {
@@ -31,7 +33,8 @@ export function enterDataCircle(
 			}
 			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
-		});
+		})
+		.style('opacity', opacity);
 }
 
 export function updateDataCircle(

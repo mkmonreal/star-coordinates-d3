@@ -12,7 +12,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { Card, ColorPicker, Flex, InputNumber, Radio, Select } from 'antd';
+import {
+	Card,
+	ColorPicker,
+	Flex,
+	InputNumber,
+	Radio,
+	Select,
+	Slider,
+} from 'antd';
+import { selectAll } from 'd3';
 import { useState } from 'react';
 import ColorsetEnum from '../enums/colorset-enum';
 import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum';
@@ -74,9 +83,15 @@ function VisualizationConfiguration() {
 	const analysis = useConfigStore((state) => state.analysis);
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 
+	const opacity = useConfigStore((state) => state.opacity);
+	const setOpacity = useConfigStore((state) => state.setOpacity);
+
+	const radius = useConfigStore((state) => state.radius);
+	const setRadius = useConfigStore((state) => state.setRadius);
+
 	return (
 		<Flex vertical gap="middle">
-			<Card title="Colors">
+			<Card title="Data configuration">
 				<Flex vertical gap="middle">
 					<Flex gap="small" align="center" justify="space-between">
 						<h3>Class:</h3>
@@ -104,7 +119,7 @@ function VisualizationConfiguration() {
 								const newColorset = colorsetOptions.find(
 									(option) => value === option.label
 								);
-								setColorset(newColorset.value);
+								setColorset(newColorset?.value);
 							}}
 						>
 							{colorsetOptions?.map((colorset) => (
@@ -113,6 +128,36 @@ function VisualizationConfiguration() {
 								</Select.Option>
 							))}
 						</Select>
+					</Flex>
+					<Flex gap={'small'} align="center" justify="space-between">
+						<h3>Opacity:</h3>
+						<Slider
+							min={0}
+							max={100}
+							defaultValue={opacity * 100}
+							onChange={(value) => {
+								selectAll('.data-circle').style('opacity', value / 100);
+							}}
+							onChangeComplete={(value) => {
+								setOpacity(value / 100);
+							}}
+							style={{ width: '100%' }}
+						/>
+					</Flex>
+					<Flex gap={'small'} align="center" justify="space-between">
+						<h3>Circle radius:</h3>
+						<Slider
+							min={0}
+							max={50}
+							defaultValue={radius}
+							onChange={(value) => {
+								selectAll('.data-circle').attr('r', value);
+							}}
+							onChangeComplete={(value) => {
+								setRadius(value);
+							}}
+							style={{ width: '100%' }}
+						/>
 					</Flex>
 					{selectedClassColumn && (
 						<Flex vertical gap="middle" style={{ width: '100%' }}>
