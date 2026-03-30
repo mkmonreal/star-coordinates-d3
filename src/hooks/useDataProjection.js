@@ -18,7 +18,7 @@ import NormalizationMethodEnum from '../enums/normalization-method-enum';
 import normalizeData from '../js/data/normalize';
 import standarizeData from '../js/data/standarize';
 
-function useDataProjection(originalData, selectedColumns, normalizationMethod) {
+function useDataProjection(normalizationMethod, originalData, selectedColumns) {
 	const dataProjection = useMemo(() => {
 		const originalMatrix = matrix(
 			matrixFromColumns(

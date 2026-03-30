@@ -28,21 +28,26 @@ import useConfigStore from './stores/config-store';
 import useStarCoordinatesStore from './stores/star-coorditantes-store';
 
 const onFileReaderLoad = (
-	event,
 	parser,
 	setOriginalData,
 	setColumns,
 	setValidColumns,
-	setSelectedColumns
+	setSelectedColumns,
+	idColumn,
+	event
 ) => {
 	const result = event.target?.result;
-	const csv = parser(result);
+	let csv = parser(result);
+
+	csv.columns = ['scIdColumn', ...csv.columns];
 	const { columns } = csv;
+
+	csv = csv.map((row, i) => ({ ...row, scIdColumn: i }));
+	csv.columns = columns;
 
 	setColumns(columns);
 	setOriginalData(csv);
 
-	// 1. Sacar las columnas que solo tienen valores numericos
 	const validColumns = [];
 	const incompleteColumn = [];
 	for (const column of columns) {
@@ -56,16 +61,13 @@ const onFileReaderLoad = (
 			.map((d) => parseFloat(d))
 			.filter((d) => !isNaN(d));
 		if (numericData.length === columnWithoutNull.length) {
-			validColumns.push(column);
+			if (idColumn !== column) {
+				validColumns.push(column);
+			}
 		}
 	}
 	setValidColumns(validColumns);
 	setSelectedColumns(validColumns);
-
-	// 2. Crear los vectores. NO ES NECESARIO
-
-	// 3. Normalizar los datos. NO ES NECESARIO
-	// 3.1. Crear la matriz de datos
 };
 
 const onFileInputChange = (event, onLoad) => {
@@ -97,12 +99,13 @@ function App() {
 
 	const fileReaderFunc = (ev) =>
 		onFileReaderLoad(
-			ev,
 			parseCsv,
 			setOriginalData,
 			setColumns,
 			setValidColumns,
-			setSelectedColumns
+			setSelectedColumns,
+			idColumn,
+			ev
 		);
 
 	const fileChangeFunc = (ev) => onFileInputChange(ev, fileReaderFunc);
