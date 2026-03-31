@@ -102,11 +102,13 @@ function VisualizationConfiguration() {
 							onChange={setSelectedClassColumn}
 							placeholder="Select a column"
 						>
-							{columns?.map((column) => (
-								<Select.Option key={column} value={column}>
-									{column}
-								</Select.Option>
-							))}
+							{columns
+								?.filter((column) => 'scIdColumn' !== column)
+								.map((column) => (
+									<Select.Option key={column} value={column}>
+										{column}
+									</Select.Option>
+								))}
 						</Select>
 					</Flex>
 					<Flex gap="small" align="center" justify="space-between">

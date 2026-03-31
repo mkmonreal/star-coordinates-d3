@@ -41,10 +41,8 @@ const onFileReaderLoad = (
 
 	csv.columns = ['scIdColumn', ...csv.columns];
 	const { columns } = csv;
-
 	csv = csv.map((row, i) => ({ ...row, scIdColumn: i }));
 	csv.columns = columns;
-
 	setColumns(columns);
 	setOriginalData(csv);
 
@@ -146,7 +144,7 @@ function App() {
 				onClose={() => setIsOpen(false)}
 				open={isOpen}
 			>
-				<Configuration idColumn={idColumn} />
+				<Configuration />
 			</Drawer>
 			<input
 				ref={inputFileRef}

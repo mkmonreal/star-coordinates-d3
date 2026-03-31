@@ -95,11 +95,13 @@ const AnalysisConfiguration = () => {
 								}}
 								placeholder="Select a column"
 							>
-								{columns?.map((column) => (
-									<Select.Option key={column} value={column}>
-										{column}
-									</Select.Option>
-								))}
+								{columns
+									?.filter((column) => 'scIdColumn' === column)
+									.map((column) => (
+										<Select.Option key={column} value={column}>
+											{column}
+										</Select.Option>
+									))}
 							</Select>
 						</Flex>
 					) : null}

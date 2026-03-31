@@ -13,12 +13,11 @@
 //    limitations under the License.
 
 import { Tabs } from 'antd';
-import PropTypes from 'prop-types';
 import AnalysisConfiguration from './AnalysisConfiguration';
 import ColumnsConfiguration from './ColumnsConfiguration';
 import VisualizationConfiguration from './VisualizationConfiguration';
 
-function Configuration({ idColumn }) {
+function Configuration() {
 	return (
 		<Tabs
 			defaultActiveKey="column-config"
@@ -26,7 +25,7 @@ function Configuration({ idColumn }) {
 				{
 					label: 'Columns configuration',
 					key: 'column-config',
-					children: <ColumnsConfiguration idColumn={idColumn} />,
+					children: <ColumnsConfiguration />,
 				},
 				{
 					label: 'Analysis configuration',
@@ -43,8 +42,6 @@ function Configuration({ idColumn }) {
 	);
 }
 
-Configuration.propTypes = {
-	idColumn: PropTypes.string.isRequired,
-};
+Configuration.propTypes = {};
 
 export default Configuration;
