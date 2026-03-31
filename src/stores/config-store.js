@@ -20,7 +20,7 @@ import DimensionalityReductionEnum from '../enums/dimensionality-reduction-enum'
 import VectorNameVisualizationEnum from '../enums/vector-name-visualizaton-enum';
 
 const useConfigStore = create((set) => ({
-	idColumn: '',
+	idColumn: 'scIdColumn',
 	unitCircleRadius: 150,
 	selectedVectors: [],
 	className: null,

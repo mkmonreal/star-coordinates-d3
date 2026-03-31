@@ -45,9 +45,9 @@ function StarCoordinatesWrapper({ height, width }) {
 	const analysis = useConfigStore((state) => state.analysis);
 
 	const { dataMatrix, columnsIndexMap } = useDataProjection(
+		normalizationMethod,
 		originalData,
-		selectedColumns,
-		normalizationMethod
+		selectedColumns
 	);
 
 	const classesIndexMap = useClassesIndexMap(
