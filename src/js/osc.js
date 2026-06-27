@@ -26,23 +26,27 @@ import { multiply } from 'mathjs';
 import { subtract } from 'mathjs';
 
 export function osc(vectors) {
+	if (!vectors || vectors.length === 0) {
+		return undefined;
+	}
+
 	const vectorMatrix = matrix(
 		vectors.map((vector) => [vector.cartesian.x, vector.cartesian.y])
 	);
 
-	const col = column(vectorMatrix, 0).toArray()?.flat();
-	const vectorLength = length(col);
-	const newColA = divide(col, vectorLength);
-	console.log(col);
-	console.log(newColA);
+	const x = column(vectorMatrix, 0).toArray()?.flat(); // [x₁, x₂, ..., xₙ]
+	const y = column(vectorMatrix, 1).toArray()?.flat(); // [y₁, y₂, ..., yₙ]
 
-	const projection = multiply(dot(col, newColA), newColA);
-	const aa = subtract(col, projection);
-	const newColB = divide(aa, length(aa));
-	const newVectorMatrix = matrix(matrixFromColumns(newColA, newColB));
-	console.log('newColA', newColA);
-	console.log('newColB', newColB);
-	console.log('newMatrix', newVectorMatrix);
+	const xNorm = length(x);
+	const xNormalized = divide(x, xNorm);
+
+	const dotYX = dot(y, xNormalized);
+	const projection = multiply(dotYX, xNormalized);
+	const yOrthogonal = subtract(y, projection);
+
+	const yNormalized = divide(yOrthogonal, length(yOrthogonal));
+
+	const newVectorMatrix = matrix(matrixFromColumns(xNormalized, yNormalized));
 
 	const newVectors = vectors.map((vector, index) => {
 		const matrixRow = row(newVectorMatrix, index).toArray()[0];
@@ -54,6 +58,7 @@ export function osc(vectors) {
 		);
 		return newRow;
 	});
+
 	return newVectors;
 }
 
