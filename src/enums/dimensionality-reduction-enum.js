@@ -16,6 +16,7 @@ const DimensionalityReductionEnum = Object.freeze({
 	NONE: 'None',
 	PCA: 'PCA',
 	LDA: 'LDA',
+	OSC: 'OSC',
 });
 
 export default DimensionalityReductionEnum;

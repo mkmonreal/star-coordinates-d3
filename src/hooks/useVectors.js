@@ -19,6 +19,7 @@ import { pca } from '../js/pca';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import { buildCartesianVector, buildPolarVector } from '../utils/vector';
+import { osc } from '../js/osc';
 
 function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 	const vectorsInitialized = useConfigStore(
@@ -49,6 +50,12 @@ function useVectors(columnsIndexMap, analysis, matrix, classesIndexesMap) {
 				return vectors;
 			}
 			return createInitalVectors(columnsNames);
+		}
+
+		if (DimensionalityReductionEnum.OSC === analysis) {
+			const newVectors = osc(vectors);
+			console.log(newVectors);
+			return newVectors;
 		}
 
 		const eigenDecomposition = createEigenDecomposition(
@@ -123,6 +130,7 @@ function createEigenDecomposition(analysis, matrix, classesIndexesMap) {
 		}
 		const { linearDiscriminants } = lda(matrix, classesIndexesMap);
 		return linearDiscriminants;
+	} else if (DimensionalityReductionEnum.OSC === analysis) {
 	}
 }
 
