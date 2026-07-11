@@ -25,7 +25,7 @@ const useConfigStore = create((set) => ({
 	selectedVectors: [],
 	className: null,
 	radius: 4,
-	opacity: 0.7,
+	opacity: 0.65,
 	fill: orange.primary,
 	stroke: volcano.primary,
 	colorset: ColorsetEnum.VIRIDIS,

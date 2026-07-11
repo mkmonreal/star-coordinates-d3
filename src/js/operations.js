@@ -31,14 +31,14 @@ export const createCenteredMatrix = (data) => {
 };
 
 export const createCovarianceMatrix = (data, centeredMatrix = null) => {
-	const [_, nCols] = data.size();
+	const [nRows, nCols] = data.size();
 	if (!centeredMatrix) {
 		centeredMatrix = createCenteredMatrix(data);
 	}
 	const transposedMatrix = transpose(centeredMatrix);
 
 	const covarianceMatrix = multiply(
-		divide(1, subtract(nCols, 1)),
+		divide(1, subtract(nRows, 1)),
 		multiply(transposedMatrix, centeredMatrix)
 	);
 
