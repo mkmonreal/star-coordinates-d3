@@ -12,12 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+import { Popover, Descriptions } from 'antd';
 import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 import useAutomaticMovement from '../hooks/useAutomaticMovement';
 import useD3ArrowDrag from '../hooks/useD3ArrowDrag';
 import useD3ArrowRender from '../hooks/useD3ArrowRender';
 import useD3DataCircleRender from '../hooks/useD3DataCircleRender';
+import useD3DataPopover from '../hooks/useD3DataPopover';
 import useD3SVGSetup from '../hooks/useD3SVGSetup';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
@@ -33,8 +35,15 @@ function StarCoordinates({
 	const { svgRef, currentViewBox } = useD3SVGSetup(width, height);
 
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
+	const selectedColumns = useStarCoordinatesStore(
+		(state) => state.selectedColumns
+	);
+	const selectedClassColumn = useStarCoordinatesStore(
+		(state) => state.selectedClassColumn
+	);
 
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
+	const idColumn = useConfigStore((state) => state.idColumn);
 
 	const points = useMemo(() => {
 		return calculatePoints(vectors, dataMatrix, originalData);
@@ -52,7 +61,68 @@ function StarCoordinates({
 		points
 	);
 
-	return <svg className="star-coordinates" ref={svgRef}></svg>;
+	const { popoverVisible, popoverPosition, popoverData, popoverRef } =
+		useD3DataPopover(svgRef, points);
+
+	const formatValue = (value) => {
+		if (typeof value === 'number') {
+			return value.toFixed(3);
+		}
+		return value;
+	};
+
+	const isHighlighted = (key) => {
+		return selectedColumns.includes(key) || key === selectedClassColumn;
+	};
+
+	const popoverContent = popoverData ? (
+		<Descriptions
+			title="Datos del punto"
+			column={1}
+			size="small"
+			bordered
+			style={{ maxWidth: 400 }}
+		>
+			{Object.entries(popoverData)
+				.filter(([key]) => key !== idColumn)
+				.map(([key, value]) => (
+					<Descriptions.Item
+						key={key}
+						label={key}
+						labelStyle={
+							isHighlighted(key)
+								? { fontWeight: 'bold', color: '#1890ff' }
+								: {}
+						}
+					>
+						{formatValue(value)}
+					</Descriptions.Item>
+				))}
+		</Descriptions>
+	) : null;
+
+	return (
+		<>
+			<svg className="star-coordinates" ref={svgRef}></svg>
+			<Popover
+				open={popoverVisible}
+				content={popoverContent}
+				placement="topRight"
+			>
+				<div
+					ref={popoverRef}
+					style={{
+						position: 'absolute',
+						left: popoverPosition.x,
+						top: popoverPosition.y,
+						width: 1,
+						height: 1,
+						pointerEvents: 'none',
+					}}
+				/>
+			</Popover>
+		</>
+	);
 }
 
 StarCoordinates.propTypes = {
