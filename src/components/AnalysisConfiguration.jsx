@@ -44,6 +44,7 @@ const AnalysisConfiguration = () => {
 	const setNormalizationMethod = useConfigStore(
 		(state) => state.setNormalizationMethod
 	);
+	const idColumn = useConfigStore((state) => state.idColumn);
 
 	const columns = useStarCoordinatesStore((state) => state.columns);
 	const selectedClassColumn = useStarCoordinatesStore(
@@ -96,7 +97,10 @@ const AnalysisConfiguration = () => {
 								placeholder="Select a column"
 							>
 								{columns
-									?.filter((column) => 'scIdColumn' === column)
+									?.filter(
+										(column) =>
+											column !== 'scIdColumn' && column !== idColumn
+									)
 									.map((column) => (
 										<Select.Option key={column} value={column}>
 											{column}

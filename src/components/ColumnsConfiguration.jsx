@@ -46,6 +46,12 @@ function ColumnsConfiguration() {
 	const removeSelectedColumn = useStarCoordinatesStore(
 		(state) => state.removeSelectedColumn
 	);
+	const setValidColumns = useStarCoordinatesStore(
+		(state) => state.setValidColumns
+	);
+	const setSelectedColumns = useStarCoordinatesStore(
+		(state) => state.setSelectedColumns
+	);
 
 	const [showNotSelectedColumns, setShowNotSelectedColumns] = useState(false);
 
@@ -68,8 +74,21 @@ function ColumnsConfiguration() {
 							if ('scIdColumn' !== idColumn) {
 								addSelectedColumn(idColumn);
 							}
+
 							setIdColumn(value);
 							removeSelectedColumn(value);
+
+							if ('scIdColumn' !== value) {
+								const newValidColumns = validColumns.filter(
+									(col) => col !== 'scIdColumn'
+								);
+								setValidColumns(newValidColumns);
+							} else {
+								if (!validColumns.includes('scIdColumn')) {
+									setValidColumns([...validColumns, 'scIdColumn']);
+								}
+							}
+
 							setVectorsInitialized(false);
 						}}
 						value={idColumn}

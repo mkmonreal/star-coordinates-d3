@@ -91,7 +91,7 @@ function StarCoordinates({
 			style={{ maxWidth: 400 }}
 		>
 			{Object.entries(popoverData)
-				.filter(([key]) => key !== idColumn)
+				.filter(([key]) => key !== idColumn && key !== 'scIdColumn')
 				.map(([key, value]) => (
 					<Descriptions.Item
 						key={key}
@@ -116,7 +116,7 @@ function StarCoordinates({
 			bordered
 		>
 			{Object.entries(drawerData)
-				.filter(([key]) => key !== idColumn)
+				.filter(([key]) => key !== idColumn && key !== 'scIdColumn')
 				.map(([key, value]) => (
 					<Descriptions.Item
 						key={key}

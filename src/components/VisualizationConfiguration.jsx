@@ -65,6 +65,7 @@ function VisualizationConfiguration() {
 		(state) => state.setSelectedClassColumn
 	);
 
+	const idColumn = useConfigStore((state) => state.idColumn);
 	const setColorset = useConfigStore((state) => state.setColorset);
 	const vectorVisualization = useConfigStore(
 		(state) => state.vectorVisualization
@@ -103,7 +104,9 @@ function VisualizationConfiguration() {
 							placeholder="Select a column"
 						>
 							{columns
-								?.filter((column) => 'scIdColumn' !== column)
+								?.filter(
+									(column) => column !== 'scIdColumn' && column !== idColumn
+								)
 								.map((column) => (
 									<Select.Option key={column} value={column}>
 										{column}
