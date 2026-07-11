@@ -12,14 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { Popover, Descriptions } from 'antd';
+import { Popover, Descriptions, Drawer } from 'antd';
 import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 import useAutomaticMovement from '../hooks/useAutomaticMovement';
 import useD3ArrowDrag from '../hooks/useD3ArrowDrag';
 import useD3ArrowRender from '../hooks/useD3ArrowRender';
 import useD3DataCircleRender from '../hooks/useD3DataCircleRender';
-import useD3DataPopover from '../hooks/useD3DataPopover';
+import useD3DataViewer from '../hooks/useD3DataViewer';
 import useD3SVGSetup from '../hooks/useD3SVGSetup';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
@@ -61,8 +61,15 @@ function StarCoordinates({
 		points
 	);
 
-	const { popoverVisible, popoverPosition, popoverData, popoverRef } =
-		useD3DataPopover(svgRef, points);
+	const {
+		popoverVisible,
+		popoverPosition,
+		popoverData,
+		popoverRef,
+		drawerVisible,
+		drawerData,
+		setDrawerVisible,
+	} = useD3DataViewer(svgRef, points);
 
 	const formatValue = (value) => {
 		if (typeof value === 'number') {
@@ -101,6 +108,31 @@ function StarCoordinates({
 		</Descriptions>
 	) : null;
 
+	const drawerContent = drawerData ? (
+		<Descriptions
+			title="Datos del punto"
+			column={1}
+			size="small"
+			bordered
+		>
+			{Object.entries(drawerData)
+				.filter(([key]) => key !== idColumn)
+				.map(([key, value]) => (
+					<Descriptions.Item
+						key={key}
+						label={key}
+						labelStyle={
+							isHighlighted(key)
+								? { fontWeight: 'bold', color: '#1890ff' }
+								: {}
+						}
+					>
+						{formatValue(value)}
+					</Descriptions.Item>
+				))}
+		</Descriptions>
+	) : null;
+
 	return (
 		<>
 			<svg className="star-coordinates" ref={svgRef}></svg>
@@ -121,6 +153,14 @@ function StarCoordinates({
 					}}
 				/>
 			</Popover>
+			<Drawer
+				title="Información del punto"
+				placement="left"
+				onClose={() => setDrawerVisible(false)}
+				open={drawerVisible}
+			>
+				{drawerContent}
+			</Drawer>
 		</>
 	);
 }

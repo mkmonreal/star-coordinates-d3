@@ -15,10 +15,12 @@
 import { select } from 'd3';
 import { useEffect, useRef, useState } from 'react';
 
-function useD3DataPopover(svgRef, points) {
+function useD3DataViewer(svgRef, points) {
 	const [popoverVisible, setPopoverVisible] = useState(false);
 	const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
 	const [popoverData, setPopoverData] = useState(null);
+	const [drawerVisible, setDrawerVisible] = useState(false);
+	const [drawerData, setDrawerData] = useState(null);
 	const popoverRef = useRef(null);
 	const hideTimeoutRef = useRef(null);
 
@@ -53,6 +55,12 @@ function useD3DataPopover(svgRef, points) {
 			}, 100);
 		});
 
+		svg.selectAll('.data-circle').on('click', function (event, d) {
+			event.stopPropagation();
+			setDrawerData(d.originalValue);
+			setDrawerVisible(true);
+		});
+
 		return () => {
 			if (hideTimeoutRef.current) {
 				clearTimeout(hideTimeoutRef.current);
@@ -65,7 +73,10 @@ function useD3DataPopover(svgRef, points) {
 		popoverPosition,
 		popoverData,
 		popoverRef,
+		drawerVisible,
+		drawerData,
+		setDrawerVisible,
 	};
 }
 
-export default useD3DataPopover;
+export default useD3DataViewer;
