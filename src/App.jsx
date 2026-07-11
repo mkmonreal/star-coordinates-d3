@@ -127,17 +127,26 @@ function App() {
 			)}
 
 			<FloatButton.Group shape="circle">
-				<FloatButton
-					icon={<SelectOutlined />}
-					type={selectionMode ? 'primary' : 'default'}
-					onClick={() => {
-						if (selectionMode) {
-							clearSelectedPoints();
-						}
-						setSelectionMode(!selectionMode);
-					}}
-					tooltip="Selection mode"
-				/>
+				{validColumns.length > 0 && (
+					<>
+						<FloatButton
+							icon={<SelectOutlined />}
+							type={selectionMode ? 'primary' : 'default'}
+							onClick={() => {
+								if (selectionMode) {
+									clearSelectedPoints();
+								}
+								setSelectionMode(!selectionMode);
+							}}
+							tooltip="Selection mode"
+						/>
+						<FloatButton
+							icon={<SettingFilled />}
+							type="default"
+							onClick={() => setIsOpen(true)}
+						/>
+					</>
+				)}
 				<FloatButton
 					icon={<FileAddFilled />}
 					type="primary"
@@ -149,11 +158,6 @@ function App() {
 					icon={<GithubOutlined />}
 					href="https://github.com/mkmonreal/star-coordinates-d3"
 					target="_blank"
-				/>
-				<FloatButton
-					icon={<SettingFilled />}
-					type="default"
-					onClick={() => setIsOpen(true)}
 				/>
 			</FloatButton.Group>
 			<Drawer
