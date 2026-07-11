@@ -27,6 +27,7 @@ function useD3DataCircleRender(svgRef, points) {
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const opacity = useConfigStore((state) => state.opacity);
 	const radius = useConfigStore((state) => state.radius);
+	const selectedPointIds = useConfigStore((state) => state.selectedPointIds);
 
 	const selectedClassColumn = useStarCoordinatesStore(
 		(state) => state.selectedClassColumn
@@ -53,18 +54,30 @@ function useD3DataCircleRender(svgRef, points) {
 						radius,
 						opacity,
 						selectColor,
-						selectedClassColumn
+						selectedClassColumn,
+						selectedPointIds
 					),
 				(update) =>
 					updateDataCircle(
 						update,
 						unitCircleRadius,
 						selectColor,
-						selectedClassColumn
+						selectedClassColumn,
+						selectedPointIds,
+						opacity
 					),
 				exitDataCircle
 			);
-	}, [svgRef, points, unitCircleRadius, selectColor, selectedClassColumn]);
+	}, [
+		svgRef,
+		points,
+		unitCircleRadius,
+		selectColor,
+		selectedClassColumn,
+		selectedPointIds,
+		radius,
+		opacity,
+	]);
 }
 
 export default useD3DataCircleRender;

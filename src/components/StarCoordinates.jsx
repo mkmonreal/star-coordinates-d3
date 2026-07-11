@@ -14,16 +14,18 @@
 
 import { Popover, Descriptions, Drawer } from 'antd';
 import PropTypes from 'prop-types';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import useAutomaticMovement from '../hooks/useAutomaticMovement';
 import useD3ArrowDrag from '../hooks/useD3ArrowDrag';
 import useD3ArrowRender from '../hooks/useD3ArrowRender';
 import useD3DataCircleRender from '../hooks/useD3DataCircleRender';
 import useD3DataViewer from '../hooks/useD3DataViewer';
 import useD3SVGSetup from '../hooks/useD3SVGSetup';
+import usePointSelection from '../hooks/usePointSelection';
 import useConfigStore from '../stores/config-store';
 import useStarCoordinatesStore from '../stores/star-coorditantes-store';
 import { calculatePoints } from '../utils/data-projection';
+import { select } from 'd3';
 
 function StarCoordinates({
 	width,
@@ -70,6 +72,8 @@ function StarCoordinates({
 		drawerData,
 		setDrawerVisible,
 	} = useD3DataViewer(svgRef, points);
+
+	const { firstClick, selectionRect } = usePointSelection(svgRef, points);
 
 	const formatValue = (value) => {
 		if (typeof value === 'number') {
@@ -132,6 +136,32 @@ function StarCoordinates({
 				))}
 		</Descriptions>
 	) : null;
+
+	useEffect(() => {
+		if (!svgRef.current) return;
+
+		const svg = select(svgRef.current);
+		svg.selectAll('.selection-rect').remove();
+
+		if (!selectionRect) return;
+
+		const minX = Math.min(selectionRect.x1, selectionRect.x2);
+		const minY = Math.min(selectionRect.y1, selectionRect.y2);
+		const width = Math.abs(selectionRect.x2 - selectionRect.x1);
+		const height = Math.abs(selectionRect.y2 - selectionRect.y1);
+
+		svg
+			.append('rect')
+			.attr('class', 'selection-rect')
+			.attr('x', minX)
+			.attr('y', minY)
+			.attr('width', width)
+			.attr('height', height)
+			.attr('fill', 'black')
+			.attr('fill-opacity', 0.1)
+			.attr('stroke', 'black')
+			.attr('stroke-width', 1);
+	}, [svgRef, selectionRect]);
 
 	return (
 		<>

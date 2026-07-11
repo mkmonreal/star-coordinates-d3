@@ -18,6 +18,7 @@ import {
 	FileAddFilled,
 	GithubOutlined,
 	SettingFilled,
+	SelectOutlined,
 } from '@ant-design/icons';
 import { Drawer, Empty, Flex, FloatButton } from 'antd';
 import { useRef, useState } from 'react';
@@ -82,6 +83,11 @@ function App() {
 	const inputFileRef = useRef();
 
 	const idColumn = useConfigStore((state) => state.idColumn);
+	const selectionMode = useConfigStore((state) => state.selectionMode);
+	const setSelectionMode = useConfigStore((state) => state.setSelectionMode);
+	const clearSelectedPoints = useConfigStore(
+		(state) => state.clearSelectedPoints
+	);
 
 	const validColumns = useStarCoordinatesStore((state) => state.validColumns);
 	const setOriginalData = useStarCoordinatesStore(
@@ -121,6 +127,17 @@ function App() {
 			)}
 
 			<FloatButton.Group shape="circle">
+				<FloatButton
+					icon={<SelectOutlined />}
+					type={selectionMode ? 'primary' : 'default'}
+					onClick={() => {
+						if (selectionMode) {
+							clearSelectedPoints();
+						}
+						setSelectionMode(!selectionMode);
+					}}
+					tooltip="Selection mode"
+				/>
 				<FloatButton
 					icon={<FileAddFilled />}
 					type="primary"

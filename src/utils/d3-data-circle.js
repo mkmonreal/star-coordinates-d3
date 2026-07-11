@@ -18,7 +18,8 @@ export function enterDataCircle(
 	radius,
 	opacity,
 	selectColor,
-	selectedClassColumn
+	selectedClassColumn,
+	selectedPointIds
 ) {
 	enter
 		.append('circle')
@@ -26,7 +27,18 @@ export function enterDataCircle(
 		.attr('cx', (d) => d.x * unitCircleRadius)
 		.attr('cy', (d) => -d.y * unitCircleRadius)
 		.attr('r', radius)
-		.attr('stroke', 'black')
+		.attr('stroke', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return 'black';
+			}
+			return selectedPointIds.has(d.id) ? 'black' : 'none';
+		})
+		.attr('stroke-width', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return 1;
+			}
+			return selectedPointIds.has(d.id) ? 2 : 1;
+		})
 		.attr('fill', (d) => {
 			if (!selectColor) {
 				return 'orange';
@@ -34,24 +46,49 @@ export function enterDataCircle(
 			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
 		})
-		.style('opacity', opacity);
+		.style('opacity', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return opacity;
+			}
+			return selectedPointIds.has(d.id) ? 0.65 : 0.55;
+		});
 }
 
 export function updateDataCircle(
 	update,
 	unitCircleRadius,
 	selectColor,
-	selectedClassColumn
+	selectedClassColumn,
+	selectedPointIds,
+	opacity
 ) {
 	update
 		.attr('cx', (d) => d.x * unitCircleRadius)
 		.attr('cy', (d) => -d.y * unitCircleRadius)
+		.attr('stroke', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return 'black';
+			}
+			return selectedPointIds.has(d.id) ? 'black' : 'none';
+		})
+		.attr('stroke-width', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return 1;
+			}
+			return selectedPointIds.has(d.id) ? 2 : 1;
+		})
 		.attr('fill', (d) => {
 			if (!selectColor) {
 				return 'orange';
 			}
 			const fill = selectColor(d.originalValue[selectedClassColumn]);
 			return fill || 'orange';
+		})
+		.style('opacity', (d) => {
+			if (!selectedPointIds || selectedPointIds.size === 0) {
+				return opacity;
+			}
+			return selectedPointIds.has(d.id) ? 0.65 : 0.55;
 		});
 }
 

@@ -33,6 +33,8 @@ const useConfigStore = create((set) => ({
 	analysis: DimensionalityReductionEnum.NONE,
 	vectorsInitialized: false,
 	vectorVisualization: VectorNameVisualizationEnum.ALWAYS,
+	selectionMode: false,
+	selectedPointIds: new Set(),
 	setIdColumn: (idColumn) => set({ idColumn }),
 	setUnitCircleRadius: (unitCircleRadius) => set({ unitCircleRadius }),
 	setSelectedVectors: (selectedVectors) => set({ selectedVectors }),
@@ -46,6 +48,9 @@ const useConfigStore = create((set) => ({
 	setAnalysis: (analysis) => set({ analysis }),
 	setVectorsInitialized: (vectorsInitialized) => set({ vectorsInitialized }),
 	setVectorVisualization: (vectorVisualization) => set({ vectorVisualization }),
+	setSelectionMode: (selectionMode) => set({ selectionMode }),
+	setSelectedPointIds: (selectedPointIds) => set({ selectedPointIds }),
+	clearSelectedPoints: () => set({ selectedPointIds: new Set() }),
 }));
 
 export default useConfigStore;

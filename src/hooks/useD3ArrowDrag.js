@@ -42,6 +42,9 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const setAnalysis = useConfigStore((state) => state.setAnalysis);
 	const unitCircleRadius = useConfigStore((state) => state.unitCircleRadius);
 	const arrowHeadScale = unitCircleRadius / 250;
+	const selectedPointIds = useConfigStore((state) => state.selectedPointIds);
+	const radius = useConfigStore((state) => state.radius);
+	const opacity = useConfigStore((state) => state.opacity);
 
 	const originalData = useStarCoordinatesStore((state) => state.originalData);
 	const selectedClassColumn = useStarCoordinatesStore(
@@ -53,12 +56,18 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 	const currentPoints = useRef(points);
 	const currentVectors = useRef(vectors);
 	const currentDataMatrix = useRef(dataMatrix);
+	const currentSelectedPointIds = useRef(selectedPointIds);
+	const currentRadius = useRef(radius);
+	const currentOpacity = useRef(opacity);
 
 	useEffect(() => {
 		currentVectors.current = vectors;
 		currentDataMatrix.current = dataMatrix;
 		currentPoints.current = points;
-	}, [vectors, dataMatrix, points]);
+		currentSelectedPointIds.current = selectedPointIds;
+		currentRadius.current = radius;
+		currentOpacity.current = opacity;
+	}, [vectors, dataMatrix, points, selectedPointIds, radius, opacity]);
 
 	useEffect(() => {
 		const svg = select(svgRef.current);
@@ -82,6 +91,9 @@ function useD3ArrowDrag(setVectors, svgRef, points, vectors, dataMatrix) {
 							unitCircleRadius,
 							arrowHeadScale,
 							vectorVisualization,
+							currentSelectedPointIds,
+							currentRadius,
+							currentOpacity,
 						});
 					})
 					.on('end', () => {
@@ -142,6 +154,9 @@ function dragHandler({
 	unitCircleRadius,
 	arrowHeadScale,
 	vectorVisualization,
+	currentSelectedPointIds,
+	currentRadius,
+	currentOpacity,
 }) {
 	const prevVector = currentVectors.current.find(
 		(vector) => e.subject.id === vector.id
@@ -181,8 +196,11 @@ function dragHandler({
 				enterDataCircle(
 					enter,
 					unitCircleRadius,
+					currentRadius.current,
+					currentOpacity.current,
 					selectColor,
-					selectedClassColumn
+					selectedClassColumn,
+					currentSelectedPointIds.current
 				);
 			},
 			(update) => {
@@ -190,7 +208,9 @@ function dragHandler({
 					update,
 					unitCircleRadius,
 					selectColor,
-					selectedClassColumn
+					selectedClassColumn,
+					currentSelectedPointIds.current,
+					currentOpacity.current
 				);
 			},
 			exitDataCircle
