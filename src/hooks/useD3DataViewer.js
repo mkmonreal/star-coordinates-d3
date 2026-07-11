@@ -32,13 +32,13 @@ function useD3DataViewer(svgRef, points) {
 		const svg = select(svgRef.current);
 
 		svg.selectAll('.data-circle').on('mouseover', function (event, d) {
-			// Limpiar timeout de ocultación si existe
+			select(this).style('cursor', 'pointer');
+
 			if (hideTimeoutRef.current) {
 				clearTimeout(hideTimeoutRef.current);
 				hideTimeoutRef.current = null;
 			}
 
-			// Obtener posición del cursor en la pantalla
 			const x = event.clientX;
 			const y = event.clientY;
 
@@ -48,7 +48,8 @@ function useD3DataViewer(svgRef, points) {
 		});
 
 		svg.selectAll('.data-circle').on('mouseout', function () {
-			// Delay para permitir mover el cursor al popover
+			select(this).style('cursor', null);
+
 			hideTimeoutRef.current = setTimeout(() => {
 				setPopoverVisible(false);
 				setPopoverData(null);
