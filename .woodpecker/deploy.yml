@@ -1,0 +1,51 @@
+# Woodpecker CI configuration for Codeberg Pages deployment
+# https://docs.codeberg.org/ci/
+
+when:
+  branch: main
+  event: push
+
+steps:
+  # Install dependencies and build
+  build:
+    image: node:20
+    environment:
+      - CODEBERG_PAGES=true
+    commands:
+      - corepack enable
+      - corepack prepare pnpm@10 --activate
+      - pnpm install --frozen-lockfile
+      - pnpm run build
+      - echo "Build completed successfully"
+
+  # Deploy to Codeberg Pages
+  # Codeberg Pages serves from the 'pages' branch
+  deploy:
+    image: bitnami/git:latest
+    secrets: [codeberg_token]
+    commands:
+      # Configure git
+      - git config --global user.name "Woodpecker CI"
+      - git config --global user.email "ci@woodpecker-ci.org"
+
+      # Clone the pages branch or create it if it doesn't exist
+      - git clone --depth=1 --branch=pages https://woodpecker-ci:$CODEBERG_TOKEN@codeberg.org/mkmonreal/star-coordinates-d3.git pages-repo || git clone --depth=1 https://woodpecker-ci:$CODEBERG_TOKEN@codeberg.org/mkmonreal/star-coordinates-d3.git pages-repo
+
+      # If pages branch doesn't exist, create it
+      - cd pages-repo
+      - git checkout pages 2>/dev/null || git checkout --orphan pages
+
+      # Clear old content and copy new build
+      - rm -rf * .??*
+      - cp -r ../dist/* .
+      - cp -r ../dist/.* . 2>/dev/null || true
+
+      # Create .domains file for custom domain (optional)
+      # - echo "star-coordinates.example.com" > .domains
+
+      # Commit and push
+      - git add -A
+      - git diff --staged --quiet || git commit -m "Deploy from commit ${CI_COMMIT_SHA:0:7}"
+      - git push origin pages
+    when:
+      - evaluate: 'CI_PIPELINE_EVENT == "push" && CI_COMMIT_BRANCH == "main"'
