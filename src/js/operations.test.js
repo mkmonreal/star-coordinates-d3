@@ -64,11 +64,11 @@ describe('createCovarianceMatrix', () => {
 
 		const result = createCovarianceMatrix(data);
 
-		// With single column, (nCols - 1) = 0, which causes division by 0 → Infinity
-		// This is actually a bug in the implementation but we test current behavior
+		// With single column, covariance is calculated as Var(X) / (n-1)
+		// For [1,2,3]: mean=2, centered=[-1,0,1], variance=2, cov = 2/(3-1) = 1
 		const resultArray = result.toArray();
 
-		expect(resultArray[0][0]).toBe(Infinity);
+		expect(resultArray[0][0]).toBeCloseTo(1, 5);
 	});
 
 	it('should calculate covariance for a single row dataset', () => {
@@ -76,13 +76,12 @@ describe('createCovarianceMatrix', () => {
 
 		const result = createCovarianceMatrix(data);
 
-		// Expected covariance matrix for a single row
-		const expected = matrix([
-			[0, 0, 0],
-			[0, 0, 0],
-			[0, 0, 0],
-		]);
+		// With single row, (nRows - 1) = 0, which causes division by 0 → NaN
+		// This is an edge case: cannot compute sample covariance from a single sample
+		const resultArray = result.toArray();
 
-		expect(result).toEqual(expected);
+		expect(isNaN(resultArray[0][0])).toBe(true);
+		expect(isNaN(resultArray[1][1])).toBe(true);
+		expect(isNaN(resultArray[2][2])).toBe(true);
 	});
 });

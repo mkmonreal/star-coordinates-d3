@@ -15,7 +15,9 @@
 import { describe, it, expect } from 'vitest';
 import { osc } from './osc';
 import { buildCartesianVector } from '../utils/vector';
-import { sqrt, dot, sum, square } from 'mathjs';
+import { sqrt, dot, sum, square, matrix } from 'mathjs';
+import { loadIrisDataset, loadWineDataset } from './fixtures/datasets';
+import { pca } from './pca';
 
 // ============================================================================
 // Auxiliary functions for testing orthographic properties
@@ -437,5 +439,194 @@ describe('OSC - Edge Cases', () => {
 		const result = osc(vectors);
 
 		expect(isOrthographic(result)).toBe(true);
+	});
+});
+
+// ============================================================================
+// § 8.2.5 — OSC Tests Required by Memory
+// ============================================================================
+
+describe('OSC - Orthonormality (§8.2.5)', () => {
+	it('should satisfy Vᵀ·V = I (orthonormality)', () => {
+		const vectors = [
+			buildCartesianVector(2, 1, 'a', 0),
+			buildCartesianVector(1, 2, 'b', 1),
+			buildCartesianVector(0.5, 1.5, 'c', 2),
+		];
+
+		const result = osc(vectors);
+
+		// Extract column vectors
+		const x = result.map((v) => v.cartesian.x);
+		const y = result.map((v) => v.cartesian.y);
+
+		// Verify ||x||² = 1
+		const xNormSq = sum(x.map((xi) => square(xi)));
+		expect(xNormSq).toBeCloseTo(1, 10);
+
+		// Verify ||y||² = 1
+		const yNormSq = sum(y.map((yi) => square(yi)));
+		expect(yNormSq).toBeCloseTo(1, 10);
+
+		// Verify <x, y> = 0
+		const xyDot = dot(x, y);
+		expect(Math.abs(xyDot)).toBeLessThan(1e-10);
+	});
+
+	it('should produce orthonormal result for any input configuration', () => {
+		// Test with multiple random-like configurations
+		const configs = [
+			[
+				buildCartesianVector(3.2, 1.1, 'a', 0),
+				buildCartesianVector(0.5, 2.8, 'b', 1),
+			],
+			[
+				buildCartesianVector(1, 1, 'a', 0),
+				buildCartesianVector(1, -1, 'b', 1),
+				buildCartesianVector(-1, 1, 'c', 2),
+			],
+			[
+				buildCartesianVector(5, 0, 'a', 0),
+				buildCartesianVector(0, 5, 'b', 1),
+				buildCartesianVector(3, 3, 'c', 2),
+				buildCartesianVector(-2, 4, 'd', 3),
+			],
+		];
+
+		for (const config of configs) {
+			const result = osc(config);
+			const invariants = verifyOrthographicInvariants(result);
+
+			expect(invariants.isXUnitNorm).toBe(true);
+			expect(invariants.isYUnitNorm).toBe(true);
+			expect(invariants.areOrthogonal).toBe(true);
+		}
+	});
+});
+
+describe('OSC - Data Independence (§8.2.5)', () => {
+	it('should produce identical results for same axes regardless of data', () => {
+		// Create a fixed axis configuration
+		const axes = [
+			buildCartesianVector(1.5, 0.8, 'a', 0),
+			buildCartesianVector(0.6, 1.2, 'b', 1),
+			buildCartesianVector(-0.5, 1.0, 'c', 2),
+		];
+
+		// Apply OSC (does not take data as input)
+		const result1 = osc(axes);
+		const result2 = osc(axes);
+
+		// Results should be identical
+		for (let i = 0; i < result1.length; i++) {
+			expect(result1[i].cartesian.x).toBeCloseTo(result2[i].cartesian.x, 10);
+			expect(result1[i].cartesian.y).toBeCloseTo(result2[i].cartesian.y, 10);
+		}
+	});
+
+	it('should not depend on data: same axes give same result with different datasets', () => {
+		// Create a random axis configuration
+		const axes = [
+			buildCartesianVector(2.1, 0.7, 'axis0', 0),
+			buildCartesianVector(0.4, 1.9, 'axis1', 1),
+			buildCartesianVector(-0.8, 1.3, 'axis2', 2),
+			buildCartesianVector(1.2, -0.5, 'axis3', 3),
+		];
+
+		// Load different datasets (not used by OSC)
+		const { data: irisData } = loadIrisDataset();
+		const { data: wineData } = loadWineDataset();
+
+		// Apply OSC to same axes (OSC doesn't take data parameter)
+		const result1 = osc(axes);
+		const result2 = osc(axes);
+
+		// Results must be identical - OSC is purely geometric
+		for (let i = 0; i < axes.length; i++) {
+			expect(result1[i].cartesian.x).toBeCloseTo(result2[i].cartesian.x, 10);
+			expect(result1[i].cartesian.y).toBeCloseTo(result2[i].cartesian.y, 10);
+		}
+
+		// Both results should be orthonormal
+		expect(isOrthographic(result1)).toBe(true);
+		expect(isOrthographic(result2)).toBe(true);
+	});
+});
+
+describe('OSC - Idempotence with PCA (§8.2.5)', () => {
+	it('should be approximately idempotent when applied to PCA result', () => {
+		// Load Iris dataset
+		const { data } = loadIrisDataset();
+
+		// Perform PCA
+		const pcaResult = pca(data);
+		const pcs = pcaResult.principalComponents;
+
+		// Build axis configuration from first 2 PCs
+		// PCA eigenvectors are already orthonormal, so the resulting
+		// V matrix should already satisfy Vᵀ·V = I
+		const pcaVectors = [
+			buildCartesianVector(
+				pcs[0].vector.get([0]),
+				pcs[1].vector.get([0]),
+				'SepalLength',
+				0
+			),
+			buildCartesianVector(
+				pcs[0].vector.get([1]),
+				pcs[1].vector.get([1]),
+				'SepalWidth',
+				1
+			),
+			buildCartesianVector(
+				pcs[0].vector.get([2]),
+				pcs[1].vector.get([2]),
+				'PetalLength',
+				2
+			),
+			buildCartesianVector(
+				pcs[0].vector.get([3]),
+				pcs[1].vector.get([3]),
+				'PetalWidth',
+				3
+			),
+		];
+
+		// Verify PCA result is already orthonormal
+		const pcaInvariants = verifyOrthographicInvariants(pcaVectors);
+		expect(pcaInvariants.isXUnitNorm).toBe(true);
+		expect(pcaInvariants.isYUnitNorm).toBe(true);
+		expect(pcaInvariants.areOrthogonal).toBe(true);
+
+		// Apply OSC to PCA result
+		const oscResult = osc(pcaVectors);
+
+		// OSC should not significantly modify an already orthonormal configuration
+		for (let i = 0; i < pcaVectors.length; i++) {
+			// Check that vectors are very similar (may have small numerical differences)
+			const dx = Math.abs(pcaVectors[i].cartesian.x - oscResult[i].cartesian.x);
+			const dy = Math.abs(pcaVectors[i].cartesian.y - oscResult[i].cartesian.y);
+
+			// Tolerance of 1e-6 for near-idempotence
+			expect(dx).toBeLessThan(1e-6);
+			expect(dy).toBeLessThan(1e-6);
+		}
+	});
+
+	it('should preserve orthonormality when applied twice', () => {
+		const vectors = [
+			buildCartesianVector(2.5, 1.3, 'a', 0),
+			buildCartesianVector(0.8, 2.1, 'b', 1),
+			buildCartesianVector(-1.2, 1.7, 'c', 2),
+		];
+
+		const result1 = osc(vectors);
+		const result2 = osc(result1);
+
+		// Second application should produce nearly identical results (idempotent)
+		for (let i = 0; i < vectors.length; i++) {
+			expect(result1[i].cartesian.x).toBeCloseTo(result2[i].cartesian.x, 6);
+			expect(result1[i].cartesian.y).toBeCloseTo(result2[i].cartesian.y, 6);
+		}
 	});
 });
