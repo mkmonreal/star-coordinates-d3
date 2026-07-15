@@ -207,7 +207,7 @@ El proyecto implementa **95 tests unitarios** que validan la capa matemática:
 
 ## Licencia
 
-Este proyecto está licenciado bajo **Apache License 2.0**. Consulta el archivo [`LICENSE`](./LICENSE) para más detalles.
+Este proyecto está licenciado bajo **GNU Affero General Public License v3.0 (AGPL-3.0)**. Consulta el archivo [`LICENSE`](./LICENSE) para más detalles.
 
 ---
 
